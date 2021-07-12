@@ -92,8 +92,7 @@ class ApiController extends Controller
             $ProdByTax5=getProdByTax(723,10);
             $ProdByTax6=getProdByTax(717,12);
             $ProdByTax7=getProdByTax(716,12);
-            $ProdByTax8=getProdByTax(703,12);
-
+            $ProdByTax8=getProdByTax(703,20);
     //     //response
         $response=['ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
 
