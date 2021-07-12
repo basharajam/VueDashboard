@@ -11,7 +11,7 @@ class Post extends Model
 {
     protected $table="wpdm_posts";
     protected $primaryKey="ID";
-    protected $appends = ['meta','product_image'];
+    protected $appends = ['meta','images'];
     // protected $appends = ['meta','categories','product_type','product_image'];
     // protected $appends = ['meta','categories','product_type','product_image','tags'];
     //protected $appends = ['meta','categories','product_type','product_attributes','product_image','tags'];
@@ -19,7 +19,7 @@ class Post extends Model
     protected static function booted()
     {
         static::addGlobalScope('wpdm_posts', function (Builder $builder) {
-            $builder->where('post_status', 'publish');
+            $builder->where('post_status','!=','trash')->where('post_status','!=','pending')->where('post_status','!=','draft');
         });
     }
     protected $fillable =  [
@@ -47,13 +47,21 @@ class Post extends Model
     "comment_count" ,
     ];
 
-    public function scopeProducts($query){
-        return $query->where('post_type','product')->where('post_status','publish');
-    }
+    // public function scopeProducts($query){
+    //     return $query->where('post_type','product')->where('post_status','publish');
+    // }
     public function getMetaAttribute(){
         return PostMeta::where('post_id',$this->ID)->pluck('meta_value','meta_key')->toArray();
     }
-    public function getProductImageAttribute(){
+    public function getimagesAttribute(){
+        // $image_post_meta =  PostMeta::where('post_id',$this->ID)->where('meta_key','_thumbnail_id')->first();
+        // if($image_post_meta){
+        //     $image_post =  Post::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
+        //     if($image_post){
+        //         return $image_post;
+        //     }
+        // }
+        // return '';
         $image_post_meta =  PostMeta::where('post_id',$this->ID)->where('meta_key','_thumbnail_id')->first();
         if($image_post_meta){
             $image_post =  Post::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
@@ -63,6 +71,12 @@ class Post extends Model
         }
         return '';
     }
+    // public function getGalleryAttribute(){
+    //     return  Post::where('post_parent',$this->ID)
+    //                                 ->where('post_type','attachment')
+    //                                 ->get();
+
+    // }
     // public function getCategoriesAttribute(){
     //   return    TermTaxonomy::whereIn('term_taxonomy_id',
     //                         TermRelation::where('object_id',$this->ID)
