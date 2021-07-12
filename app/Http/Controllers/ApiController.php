@@ -47,4 +47,11 @@ class ApiController extends Controller
 
     }
 
+    public function test()
+    {
+        $getProds=Post::limit(100)->get();
+
+        return response()->json($getProds, 200);
+    }
+
 }
