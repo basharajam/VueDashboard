@@ -6,12 +6,17 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\TermTaxonomy;
 use App\Models\TermRelation;
+use App\Models\Term;
 class ApiController extends Controller
 {
     //
 
     public function getProds()
     {
+
+        //getCategories
+        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
+        $getTerm=Term::whereIn('term_id',$getCat)->get();
 
         //get Products By Tag id
         function getProdByTax($tax,$limit)
@@ -93,8 +98,12 @@ class ApiController extends Controller
             $ProdByTax6=getProdByTax(717,12);
             $ProdByTax7=getProdByTax(716,12);
             $ProdByTax8=getProdByTax(703,20);
-    //     //response
-        $response=['ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+
+
+
+
+    //   //response
+        $response=['Categories'=>$getTerm,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
 
        return response()->json($response, 200);
 
