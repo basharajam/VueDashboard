@@ -91,10 +91,6 @@ class ApiController extends Controller
         $ProdByTax8=getProdByTax(703,20);
 
 
-        //Get Categories 
-        $getCategoeies=TermTaxonomy::where('taxonomy','product_cat')->get();
-
-        return $getCategoeies;
 
         //response
         $response=['ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
