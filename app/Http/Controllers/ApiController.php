@@ -17,7 +17,6 @@ class ApiController extends Controller
         function getProdByTax($tax,$limit)
         {
 
-
                 //get Relations
                 $Tax0=TermRelation::where('term_taxonomy_id',TermTaxonomy::where('term_id',$tax)->pluck('term_taxonomy_id'))->take($limit)->pluck('object_id');
                 //get Products
@@ -52,14 +51,11 @@ class ApiController extends Controller
                     else{
                          $sale='';
                          $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$price,2)  . '</span>';
-                         
                     }
 
                     //img 
                     $img = 'https://www.alyaman.com/wp-content/uploads/'.$item->images->meta['_wp_attached_file'];
                     $imgArr=[['src'=>$img]];
-
-
 
                     return [
                         'id'=>$item->ID,
@@ -80,20 +76,27 @@ class ApiController extends Controller
                 return $trans;
 
         };
-    //     //end Product By Tag id
+        //end Product By Tag id
 
-    //     //Get Products By Tag
-            $ProdByTax=getProdByTax(699,12);
-            $ProdByTax0=getProdByTax(718,9);
-            $ProdByTax1=getProdByTax(720,8);
-            $ProdByTax2=getProdByTax(695,12);
-            $ProdByTax3=getProdByTax(731,12);
-            $ProdByTax4=getProdByTax(705,12);
-            $ProdByTax5=getProdByTax(723,10);
-            $ProdByTax6=getProdByTax(717,12);
-            $ProdByTax7=getProdByTax(716,12);
-            $ProdByTax8=getProdByTax(703,20);
-    //     //response
+        //Get Products By Tag
+        $ProdByTax=getProdByTax(699,12);
+        $ProdByTax0=getProdByTax(718,9);
+        $ProdByTax1=getProdByTax(720,8);
+        $ProdByTax2=getProdByTax(695,12);
+        $ProdByTax3=getProdByTax(731,12);
+        $ProdByTax4=getProdByTax(705,12);
+        $ProdByTax5=getProdByTax(723,10);
+        $ProdByTax6=getProdByTax(717,12);
+        $ProdByTax7=getProdByTax(716,12);
+        $ProdByTax8=getProdByTax(703,20);
+
+
+        //Get Categories 
+        $getCategoeies=TermTaxonomy::where('taxonomy','product_cat')->get();
+
+        return $getCategoeies;
+
+        //response
         $response=['ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
 
        return response()->json($response, 200);
