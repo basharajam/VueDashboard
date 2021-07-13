@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\TermTaxonomy;
 use App\Models\TermRelation;
+use App\Models\Term;
 class ApiController extends Controller
 {
     //
@@ -13,6 +14,20 @@ class ApiController extends Controller
     public function getProds()
     {
 
+        //getCategories
+        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
+        $getTerm=Term::whereIn('term_id',$getCat)->get();
+        $transCat=$getTerm->map(function($item){
+
+            //return $item ;
+
+            return [
+                'name'=>$item->name,
+                'slug'=>$item->slug,
+                'image'=>(object)array('src'=>$item->taxonomy->image->meta['_wp_attached_file'])
+            ];
+
+        });
         //get Products By Tag id
         function getProdByTax($tax,$limit)
         {
@@ -76,24 +91,23 @@ class ApiController extends Controller
                 return $trans;
 
         };
-        //end Product By Tag id
+    //     //end Product By Tag id
 
-        //Get Products By Tag
-        $ProdByTax=getProdByTax(699,12);
-        $ProdByTax0=getProdByTax(718,9);
-        $ProdByTax1=getProdByTax(720,8);
-        $ProdByTax2=getProdByTax(695,12);
-        $ProdByTax3=getProdByTax(731,12);
-        $ProdByTax4=getProdByTax(705,12);
-        $ProdByTax5=getProdByTax(723,10);
-        $ProdByTax6=getProdByTax(717,12);
-        $ProdByTax7=getProdByTax(716,12);
-        $ProdByTax8=getProdByTax(703,20);
-
+    //     //Get Products By Tag
+            $ProdByTax=getProdByTax(699,12);
+            $ProdByTax0=getProdByTax(718,9);
+            $ProdByTax1=getProdByTax(720,8);
+            $ProdByTax2=getProdByTax(695,12);
+            $ProdByTax3=getProdByTax(731,12);
+            $ProdByTax4=getProdByTax(705,12);
+            $ProdByTax5=getProdByTax(723,10);
+            $ProdByTax6=getProdByTax(717,12);
+            $ProdByTax7=getProdByTax(716,12);
+            $ProdByTax8=getProdByTax(703,20);
 
 
         //response
-        $response=['ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+        $response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
 
        return response()->json($response, 200);
 

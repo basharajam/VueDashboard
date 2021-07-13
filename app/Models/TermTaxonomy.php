@@ -20,11 +20,12 @@ class TermTaxonomy extends Model
     protected $with=['posts'];
     public $timestamps = false;
 
+    protected $appends = ['image'];
     // protected $appends = ['image','terms'];
 
-    // public function scopeCategories($query){
-    //     return $query->whereIn('taxonomy',['category'])->distinct('product_cat');
-    // }
+    public function scopeCategories($query){
+        return $query->whereIn('taxonomy',['category'])->distinct('product_cat');
+    }
 
     // public function term(){
     //     return $this->belongsTo('App\Models\WP\Term','term_id');
@@ -42,17 +43,17 @@ class TermTaxonomy extends Model
     //                         ->where('supplier_id',\Auth::user()->userable_id)->get();
     //     }
     // }
-    // public function getImageAttribute()
-    // {
-    //     $image_post_meta =  TermMeta::where('term_id',$this->term_id)->where('meta_key','thumbnail_id')->first();
-    //     if($image_post_meta){
-    //         $image_post =  Post::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
-    //         if($image_post){
-    //             return $image_post;
-    //         }
-    //     }
-    //     return '';
-    // }
+    public function getImageAttribute()
+    {
+        $image_post_meta =  TermMeta::where('term_id',$this->term_id)->where('meta_key','thumbnail_id')->first();
+        if($image_post_meta){
+            $image_post =  Post::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
+            if($image_post){
+                return $image_post;
+            }
+        }
+        return '';
+    }
     // public function getParentCategoryAttribute(){
     //     if($this->parent){
     //         return TermTaxonomy::where('term_taxonomy_id',$this->parent)->first();
