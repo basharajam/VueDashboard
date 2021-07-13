@@ -24,7 +24,7 @@ class ApiController extends Controller
             return [
                 'name'=>$item->name,
                 'slug'=>$item->slug,
-                'image'=>(object)array('src'=>$item->taxonomy->image->meta['_wp_attached_file'])
+                'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
             ];
 
         });
