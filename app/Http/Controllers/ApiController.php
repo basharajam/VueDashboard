@@ -17,7 +17,7 @@ class ApiController extends Controller
 
   
 
-        getCategories
+        //getCategories
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
         $getTerm=Term::whereIn('term_id',$getCat)->get();
         $transCat=$getTerm->map(function($item){
