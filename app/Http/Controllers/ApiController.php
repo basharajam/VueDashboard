@@ -74,9 +74,14 @@ class ApiController extends Controller
                     }
 
                     //img 
+                    if(!empty($item->images->meta)){
 
-                    $img = 'https://www.alyaman.com/wp-content/uploads/'.$item->images->meta['_wp_attached_file'];
-                    $imgArr=[['src'=>$img]];
+                        $img = 'https://www.alyaman.com/wp-content/uploads/'.$item->images->meta['_wp_attached_file'];
+                        $imgArr=[['src'=>$img]];
+                    }
+                    else{
+                        $imgArr=null;
+                    }
 
                     return [
                         'id'=>$item->ID,
