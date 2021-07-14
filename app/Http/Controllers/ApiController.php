@@ -14,20 +14,26 @@ class ApiController extends Controller
     public function getProds()
     {
 
+
+  
+
         //getCategories
-        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
-        $getTerm=Term::whereIn('term_id',$getCat)->get();
-        $transCat=$getTerm->map(function($item){
+        // $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
+        // $getTerm=Term::whereIn('term_id',$getCat)->get();
+        // $transCat=$getTerm->map(function($item){
 
-            //return $item ;
+        //     //return $item ;
 
-            return [
-                'name'=>$item->name,
-                'slug'=>$item->slug,
-                'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
-            ];
+        //     return [
+        //         'name'=>$item->name,
+        //         'slug'=>$item->slug,
+        //         'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
+        //     ];
 
-        });
+        // });
+
+
+      
         //get Products By Tag id
         function getProdByTax($tax,$limit)
         {
@@ -38,7 +44,7 @@ class ApiController extends Controller
                 $ProdByTax=Post::whereIn('id',$Tax0)->where('post_type','!=','attachment')->get();
                 $trans=$ProdByTax->map(function($item){
     
-                    //return $item;
+                    return $item;
 
                     $arr=$item->meta;
                     //regular
@@ -91,6 +97,8 @@ class ApiController extends Controller
                 return $trans;
 
         };
+
+      
     //     //end Product By Tag id
 
     //     //Get Products By Tag
