@@ -17,20 +17,20 @@ class ApiController extends Controller
 
   
 
-        //getCategories
-        // $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
-        // $getTerm=Term::whereIn('term_id',$getCat)->get();
-        // $transCat=$getTerm->map(function($item){
+        getCategories
+        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
+        $getTerm=Term::whereIn('term_id',$getCat)->get();
+        $transCat=$getTerm->map(function($item){
 
-        //     //return $item ;
+            //return $item ;
 
-        //     return [
-        //         'name'=>$item->name,
-        //         'slug'=>$item->slug,
-        //         'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
-        //     ];
+            return [
+                'name'=>$item->name,
+                'slug'=>$item->slug,
+                'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
+            ];
 
-        // });
+        });
 
 
       
