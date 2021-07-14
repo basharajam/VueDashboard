@@ -21,7 +21,7 @@ class ApiController extends Controller
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
         $getTerm=Term::whereIn('term_id',$getCat)->get();
         $transCat=$getTerm->map(function($item){
-
+       
             //return $item ;
 
             return [
@@ -31,7 +31,6 @@ class ApiController extends Controller
             ];
 
         });
-
 
       
         //get Products By Tag id
@@ -44,7 +43,7 @@ class ApiController extends Controller
                 $ProdByTax=Post::whereIn('id',$Tax0)->where('post_type','!=','attachment')->get();
                 $trans=$ProdByTax->map(function($item){
     
-                    return $item;
+                    // return $item;
 
                     $arr=$item->meta;
                     //regular
@@ -75,6 +74,7 @@ class ApiController extends Controller
                     }
 
                     //img 
+
                     $img = 'https://www.alyaman.com/wp-content/uploads/'.$item->images->meta['_wp_attached_file'];
                     $imgArr=[['src'=>$img]];
 
