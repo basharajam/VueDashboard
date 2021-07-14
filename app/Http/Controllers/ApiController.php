@@ -44,6 +44,7 @@ class ApiController extends Controller
                 $trans=$ProdByTax->map(function($item){
     
                     // return $item;
+                     
 
                     $arr=$item->meta;
                     //regular
@@ -74,9 +75,9 @@ class ApiController extends Controller
                     }
 
                     //img 
-                    if(!empty($item->images->meta)){
+                    if(!empty($item->images->guid)){
 
-                        $img = 'https://www.alyaman.com/wp-content/uploads/'.$item->images->meta['_wp_attached_file'];
+                        $img = $item->images->guid;
                         $imgArr=[['src'=>$img]];
                     }
                     else{
