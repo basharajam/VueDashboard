@@ -11,9 +11,10 @@ class ApiController extends Controller
 {
     //
 
-    public function getProds()
+    public function getProds($cur)
     {
 
+        // return $cur;
 
   
 
@@ -22,26 +23,31 @@ class ApiController extends Controller
         $getTerm=Term::whereIn('term_id',$getCat)->get();
         $transCat=$getTerm->map(function($item){
        
-            //return $item ;
-
+            if(!empty($item->taxonomy->image->guid)){
+                $img=$item->taxonomy->image->guid;
+            }
+            else{
+                $img='';
+            }
             return [
                 'name'=>$item->name,
                 'slug'=>$item->slug,
-                'image'=>(object)array('src'=> 'https://www.alyaman.com/wp-content/uploads/'.$item->taxonomy->image->meta['_wp_attached_file'])
+                'image'=>(object)array('src'=>$img)
             ];
 
         });
 
       
         //get Products By Tag id
-        function getProdByTax($tax,$limit)
+        function getProdByTax($tax,$limit,$cur)
         {
 
                 //get Relations
                 $Tax0=TermRelation::where('term_taxonomy_id',TermTaxonomy::where('term_id',$tax)->pluck('term_taxonomy_id'))->take($limit)->pluck('object_id');
                 //get Products
                 $ProdByTax=Post::whereIn('id',$Tax0)->where('post_type','!=','attachment')->get();
-                $trans=$ProdByTax->map(function($item){
+
+                $trans=$ProdByTax->map(function($item) use ($cur) {
     
                     // return $item;
                      
@@ -64,15 +70,70 @@ class ApiController extends Controller
                     if(empty($regular)){
                         $regular=$price;
                     }
+
                     //sale
                     if(array_key_exists('_sale_price',$arr)){
                          $sale=  $arr['_sale_price'];
-                         $price_html='<span =""><del aria-hidden="true"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$regular,2). '</span></del> <ins><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span> ' . number_format((int)$regular,2) . ' </span></ins></span>';
+            
+                         //$price_html='<span =""><del aria-hidden="true"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$regular,2). '</span></del> <ins><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span> ' . number_format((int)$regular,2) . ' </span></ins></span>';
                     }
                     else{
                          $sale='';
-                         $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$price,2)  . '</span>';
+                         //$price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$price,2)  . '</span>';
                     }
+
+                    $AED=0.57;
+                    $SAR=0.57;
+                    $USD=0.155;
+                    $OMR=0.06;
+                    //price html
+                    if(!empty($cur) && $cur ==='AED' ){
+
+                        $regPriceHtml=(float)$regular*$AED ;
+                        $salePriceHtml=(float)$sale*$AED;
+
+                    }
+                    elseif(!empty($cur) && $cur ==='SAR' ){
+
+                        $regPriceHtml=(float)$regular* $SAR ;
+                        $salePriceHtml=(float)$sale*$SAR;
+                    }
+                    elseif(!empty($cur) && $cur ==='USD'){
+                        
+                        $regPriceHtml=(float)$regular* $USD;
+                        $salePriceHtml=(float)$sale*$USD;
+                    }
+                    elseif(!empty($cur) && $cur ==='OMR'){
+                        $regPriceHtml=(float)$regular* $OMR;
+                        $salePriceHtml=(float)$sale*$OMR;
+                    }
+
+                    //Cur
+                    if($cur ==='USD'){
+                        $curHtml='$';
+                    }
+                    elseif($cur ==='SAR'){
+                        $curHtml='ر.س';
+                    }
+                    elseif($cur ==='AED'){
+                        $curHtml='د.م';
+                    }
+                    elseif($cur ==='OMR'){
+                        $curHtml='ر.ع';
+                    }
+                    else{
+                        return null;
+                    }
+
+                    if(array_key_exists('_sale_price',$arr) && $arr['_sale_price'] != ''){
+
+                        $price_html='<span =""><del aria-hidden="true"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>' .number_format((float)$regPriceHtml,2). '</span></del> <ins><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$salePriceHtml,2) . ' </span></ins></span>';
+                    }
+                    else{
+                        $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>  ' .number_format((float)$regPriceHtml,2)  . '  </span>';
+                    }
+
+                    //return ['price'=>$regular,'sale'=>$sale,'priceht'=>$regPriceHtml,'salehtml'=>$salePriceHtml];
 
                     //img 
                     if(!empty($item->images->guid)){
@@ -83,6 +144,8 @@ class ApiController extends Controller
                     else{
                         $imgArr=null;
                     }
+
+                    // return $price_html;
 
                     return [
                         'id'=>$item->ID,
@@ -108,16 +171,16 @@ class ApiController extends Controller
     //     //end Product By Tag id
 
     //     //Get Products By Tag
-            $ProdByTax=getProdByTax(699,12);
-            $ProdByTax0=getProdByTax(718,9);
-            $ProdByTax1=getProdByTax(720,8);
-            $ProdByTax2=getProdByTax(695,12);
-            $ProdByTax3=getProdByTax(731,12);
-            $ProdByTax4=getProdByTax(705,12);
-            $ProdByTax5=getProdByTax(723,10);
-            $ProdByTax6=getProdByTax(717,12);
-            $ProdByTax7=getProdByTax(716,12);
-            $ProdByTax8=getProdByTax(703,20);
+            $ProdByTax=getProdByTax(699,12,$cur);
+            $ProdByTax0=getProdByTax(718,9,$cur);
+            $ProdByTax1=getProdByTax(720,8,$cur);
+            $ProdByTax2=getProdByTax(695,12,$cur);
+            $ProdByTax3=getProdByTax(731,12,$cur);
+            $ProdByTax4=getProdByTax(705,12,$cur);
+            $ProdByTax5=getProdByTax(723,10,$cur);
+            $ProdByTax6=getProdByTax(717,12,$cur);
+            $ProdByTax7=getProdByTax(716,12,$cur);
+            $ProdByTax8=getProdByTax(703,20,$cur);
 
 
         //response
