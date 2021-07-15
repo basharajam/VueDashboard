@@ -91,7 +91,6 @@ class ApiController extends Controller
 
                         $regPriceHtml=(float)$regular*$AED ;
                         $salePriceHtml=(float)$sale*$AED;
-
                     }
                     elseif(!empty($cur) && $cur ==='SAR' ){
 
@@ -107,6 +106,10 @@ class ApiController extends Controller
                         $regPriceHtml=(float)$regular* $OMR;
                         $salePriceHtml=(float)$sale*$OMR;
                     }
+                    elseif(!empty($cur) && $cur ==='CNY'){
+                        $regPriceHtml=(float)$regular;
+                        $salePriceHtml=(float)$sale;
+                    }
 
                     //Cur
                     if($cur ==='USD'){
@@ -121,8 +124,8 @@ class ApiController extends Controller
                     elseif($cur ==='OMR'){
                         $curHtml='ر.ع';
                     }
-                    else{
-                        $curHtml='$';
+                    elseif($cur ==='CNY'){
+                        $curHtml='¥';
                     }
 
                     if(array_key_exists('_sale_price',$arr) && $arr['_sale_price'] != ''){
