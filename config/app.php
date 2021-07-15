@@ -123,6 +123,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'AED'=>env('AED'),
+    'USD'=>env('USD'),
+    'OMR'=>env('OMR'),
+    'SAR'=>env('SAR'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

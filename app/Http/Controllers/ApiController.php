@@ -82,10 +82,12 @@ class ApiController extends Controller
                          //$price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">ر.س</span>' .number_format((float)$price,2)  . '</span>';
                     }
 
-                    $AED=0.57;
-                    $SAR=0.57;
-                    $USD=0.155;
-                    $OMR=0.06;
+                    $AED=config('AED');
+                    $SAR=config('SAR');
+                    $USD=confg('USD');
+                    $OMR=config('OMR');
+
+                    
                     //price html
                     if(!empty($cur) && $cur ==='AED' ){
 
@@ -116,7 +118,7 @@ class ApiController extends Controller
                         $curHtml='ر.س';
                     }
                     elseif($cur ==='AED'){
-                        $curHtml='د.م';
+                        $curHtml='د.أ';
                     }
                     elseif($cur ==='OMR'){
                         $curHtml='ر.ع';
