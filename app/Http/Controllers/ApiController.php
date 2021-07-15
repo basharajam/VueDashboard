@@ -122,7 +122,7 @@ class ApiController extends Controller
                         $curHtml='ر.ع';
                     }
                     else{
-                        return null;
+                        $curHtml='$';
                     }
 
                     if(array_key_exists('_sale_price',$arr) && $arr['_sale_price'] != ''){
