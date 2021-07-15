@@ -84,10 +84,10 @@ class ApiController extends Controller
 
                     $AED=config('AED');
                     $SAR=config('SAR');
-                    $USD=confg('USD');
+                    $USD=config('USD');
                     $OMR=config('OMR');
 
-                    
+
                     //price html
                     if(!empty($cur) && $cur ==='AED' ){
 
