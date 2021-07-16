@@ -92,6 +92,11 @@ class ApiController extends Controller
                         $regPriceHtml=(float)$regular*$AED ;
                         $salePriceHtml=(float)$sale*$AED;
                     }
+                    elseif(!empty($cur) && $cur ==='SYP' ){
+
+                        $regPriceHtml=(float)$regular*$AED ;
+                        $salePriceHtml=(float)$sale*$AED;
+                    }
                     elseif(!empty($cur) && $cur ==='SAR' ){
 
                         $regPriceHtml=(float)$regular* $SAR ;
@@ -119,11 +124,14 @@ class ApiController extends Controller
                     if($cur ==='USD'){
                         $curHtml='$';
                     }
+                    elseif($cur ==='SYP'){
+                        $curHtml='د.إ';
+                    }
                     elseif($cur ==='SAR'){
                         $curHtml='ر.س';
                     }
                     elseif($cur ==='AED'){
-                        $curHtml='د.أ';
+                        $curHtml='د.إ';
                     }
                     elseif($cur ==='OMR'){
                         $curHtml='ر.ع';
