@@ -110,6 +110,10 @@ class ApiController extends Controller
                         $regPriceHtml=(float)$regular;
                         $salePriceHtml=(float)$sale;
                     }
+                    else{
+                        $regPriceHtml=(float)$regular*$USD;
+                        $salePriceHtml=(float)$sale*$USD;
+                    }
 
                     //Cur
                     if($cur ==='USD'){
@@ -126,6 +130,9 @@ class ApiController extends Controller
                     }
                     elseif($cur ==='CNY'){
                         $curHtml='¥';
+                    }
+                    else{
+                        $curHtml='$'; 
                     }
 
                     if(array_key_exists('_sale_price',$arr) && $arr['_sale_price'] != ''){
