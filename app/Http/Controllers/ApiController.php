@@ -14,10 +14,8 @@ class ApiController extends Controller
     public function getProds($cur)
     {
 
-        // return $cur;
 
   
-
         //getCategories
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
         $getTerm=Term::whereIn('term_id',$getCat)->get();
@@ -37,7 +35,6 @@ class ApiController extends Controller
 
         });
 
-      
         //get Products By Tag id
         function getProdByTax($tax,$limit,$cur)
         {
@@ -151,7 +148,7 @@ class ApiController extends Controller
                         $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>  ' .number_format((float)$regPriceHtml,2)  . '  </span>';
                     }
 
-                    //return ['price'=>$regular,'sale'=>$sale,'priceht'=>$regPriceHtml,'salehtml'=>$salePriceHtml];
+                    return ['price'=>$regular,'sale'=>$sale,'priceht'=>$regPriceHtml,'salehtml'=>$salePriceHtml];
 
                     //img 
                     if(!empty($item->images->guid)){
@@ -184,8 +181,6 @@ class ApiController extends Controller
                 return $trans;
 
         };
-
-      
     //     //end Product By Tag id
 
     //     //Get Products By Tag
@@ -200,11 +195,17 @@ class ApiController extends Controller
             $ProdByTax7=getProdByTax(716,12,$cur);
             $ProdByTax8=getProdByTax(703,20,$cur);
 
+            $ProdByBox=getProdByTax(696,4,$cur); //Prod By Box
+            $response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+            //get ProdInBox
+            $ProdInBox=getProdByTax(704,4,$cur); //Prod Sticker
+            $ProdInBox0=getProdByTax(705,4,$cur); //Prod DecIns
+            $ProdInBox1=getProdByTax(707,4,$cur); //Prod tag
+            $ProdInBox2=getProdByTax(703,4,$cur); //Prod DecRope
+            //response
+            $response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByBox'=>$ProdByBox,'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
 
-        //response
-        $response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
-
-       return response()->json($response, 200);
+            return response()->json($response, 200);
 
     }
 
