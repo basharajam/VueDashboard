@@ -148,7 +148,7 @@ class ApiController extends Controller
                         $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>  ' .number_format((float)$regPriceHtml,2)  . '  </span>';
                     }
 
-                    return ['price'=>$regular,'sale'=>$sale,'priceht'=>$regPriceHtml,'salehtml'=>$salePriceHtml];
+                    //return ['price'=>$regular,'sale'=>$sale,'priceht'=>$regPriceHtml,'salehtml'=>$salePriceHtml];
 
                     //img 
                     if(!empty($item->images->guid)){
