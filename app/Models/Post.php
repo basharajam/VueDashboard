@@ -16,7 +16,35 @@ class Post extends Corcel
 
     protected $connection = 'wordpress';
 
-    protected $appends = ['gallery','on_sale'];
+
+    protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
+
+
+    protected function getCbmAttribute(): ?string
+    {
+        return $this->getMeta('al_cbm');
+    }
+    protected function getCartqtyAttribute(): ?string
+    {
+        return $this->getMeta('al_carton_qty');
+    }
+    protected function getProductVariationsAttribute(): ?string
+    {
+        return $this->getMeta('al_carton_qty');
+    }
+
+
+
+
+    // public function getProductTypeAttribute(){
+    //     return    TermTaxonomy::whereIn('term_taxonomy_id',
+    //                             TermRelation::where('object_id',$this->ID)
+    //                                         ->pluck('term_taxonomy_id'))
+    //                             ->where('taxonomy','product_type')
+    //                             ->first();
+    // }
+
+
 
     // protected $table="wpdm_posts";
     // protected $primaryKey="ID";
