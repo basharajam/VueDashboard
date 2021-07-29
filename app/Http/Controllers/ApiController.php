@@ -12,11 +12,13 @@ class ApiController extends Controller
 {
     //
 
-    public function getProds($cur)
+    public function getProds($cur,$ship)
     {
 
 
         set_time_limit(0);
+
+
 
 
         //getCategories
@@ -40,7 +42,7 @@ class ApiController extends Controller
 
 
         //get Products By Tag id
-        function getProdBy($tax,$limit,$cur,$type)
+        function getProdBy($tax,$limit,$cur,$ship,$type)
         {
 
 
@@ -59,44 +61,64 @@ class ApiController extends Controller
                           return $model->on_sale == true;
                 })->take($limit)->values();
             }
-
+            
             //Transform Product Object
-            $trans=$ProdBy->map(function($item) use ($cur) {
-
+            $trans=$ProdBy->map(function($item) use ($cur,$ship) {
+                
                 //return $item;
 
+                $curArr=array(
+                    'AED'=>array(
+                        'exhange'=>0.57,
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'د.إ'
+                    ),
+                    'SAR'=>array(
+                        'exhange'=>0.58,
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'ر.س'
+                    ),
+                    'OMR'=>array(
+                        'exhange'=>0.06,
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'ر.ع'
+                    ),
+                    'IQD'=>array(
+                        'exhange'=>0.155, //USD
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'$'
+                    ),
+                    'LBP'=>array(
+                        'exhange'=>0.155, //USD
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'$'
+                    ),
+                    'SYP'=>array(
+                        'exhange'=>0.57, //AED
+                        'increasedShipCost'=>$ship, //AED
+                        'symbol'=>'د.إ' //AED
+                    ),
+                    'CNY'=>array(
+                        'exhange'=>1,
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'¥'
+                    ),
+                    'random'=>array(
+                        'exhange'=>0.155, //USD
+                        'increasedShipCost'=>$ship,
+                        'symbol'=>'$'
+                    )
+                );
+                $CurValues=$curArr;
 
-                $AED=0.57;
-                $SAR=0.58;
-                $OMR=0.06;
-                $USD=0.155;
-
-                $shipPerc=0.2;
-
-                $AEDship=960;
-                $SARship=2300;
-                $OMRship=985;
-                $IrqShip=1550;
-                $LbShip=1935;
-
-                $increasedAEDship=$AEDship*$shipPerc+$AEDship;
-                $increasedSARship=$SARship*$shipPerc+$SARship;
-                $increasedOMRship=$OMRship*$shipPerc+$OMRship;
-                $increasedIrqship=$IrqShip*$shipPerc+$IrqShip;
-                $increasedLbShip=$LbShip*$shipPerc+$LbShip;
-
-                if($item['type'] ==='simple'){
-
+                if($item['type'] === 'simple'){
                     $regular=$item['regular_price'];
                     $sale=$item['sale_price'];
                     $price=$item['price'];
                     $cartonQty=$item['cartqty'];
                     $Cbm=$item['cbm'];
-
                 }
                 elseif($item['type'] === 'variable'){
-
-                    //return $item['ID'];
                      $VarProd= PostV::where('post_parent',$item['ID'])->get();
                      $CbmArr=array();
                      $QtyArr=array();
@@ -110,7 +132,6 @@ class ApiController extends Controller
                         array_push($salePArr,$Prod['sale_price']);
                      }
 
-
                      $minQty=min($QtyArr);
                      $maxQty=max($QtyArr);
                      $minCbm=min($CbmArr);
@@ -119,352 +140,84 @@ class ApiController extends Controller
                      $maxRegPrice=max($regularPArr);
                      $minSalePrice=min($salePArr);
                      $maxSalePrice=max($salePArr);
-
-                     //return ['minReg'=>$minRegPrice,'maxReg'=>$maxRegPrice,'minSale'=>$minSalePrice,'maxSale'=>$maxSalePrice,'minCbm'=>$minCbm,'maxCbm'=>$maxCbm,'minQty'=>$minQty,'maxQty'=>$maxQty];
-                    
-
                 }
 
-
-                //price html
-                if(!empty($cur) && $cur ==='AED' ){
-
-                    if($item['type'] === 'simple'){
-
-                        $CartonShipPrice=$increasedAEDship*$Cbm;
-                        $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                        $fullPrice=$ProdShipPrice+(float)$regular;
-                        $saleFullPrice=$ProdShipPrice+(float)$sale;
-                        $regPriceHtml=$fullPrice*$AED ;
-                        $salePriceHtml=$saleFullPrice*$AED;
-
-                    }
-                    elseif($item['type'] === 'variable'){
+                if($item['type'] ==='simple' && array_key_exists($cur,$curArr)){
 
 
-                        $minCartonShipPrice=(float)$increasedAEDship*$minCbm;
-                        $maxCartonShipPrice=(float)$increasedAEDship*$maxCbm;
-                        $minProdShipPrice=(float)$minCartonShipPrice/$minQty;
-                        $maxProdShipPrice=(float)$maxCartonShipPrice/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$AED;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$AED;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$AED;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$AED;
-
-
-                    }
-
-                    $curHtml='د.إ';
-                }
-                elseif(!empty($cur) && $cur ==='SYP' ){
-
-                    if($item['type'] === 'simple'){
-
-                        $regPriceHtml=(float)$regular*$AED ;
-                        $salePriceHtml=(float)$sale*$AED;
-
-                    }else{
-
-                        $minCartonShipPrice=$increasedAEDship*$minCbm;
-                        $maxCartonShipPrice=$increasedAEDship*$maxCbm;
-                        $minProdShipPrice=$minCartonShipPrice/$minQty;
-                        $maxProdShipPrice=$maxCartonShipPrice/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$AED;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$AED;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$AED;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$AED;
-
-
-                    }
-
-                    $curHtml='د.إ';
-                }
-                elseif(!empty($cur) && $cur ==='SAR' ){
-
-                    // $CartonShipPrice=$increasedSARship*$Cbm;
-                    // $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                    // $fullPrice=$ProdShipPrice+(float)$regular;
-                    // $saleFullPrice=$ProdShipPrice+(float)$sale;
-                    // $regPriceHtml=$fullPrice* $SAR ;
-                    // $salePriceHtml=$saleFullPrice*$SAR;
-                    if($item['type'] === 'simple'){
-
-                        $CartonShipPrice=$increasedSARship*$Cbm;
-                        $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                        $fullPrice=$ProdShipPrice+(float)$regular;
-                        $saleFullPrice=$ProdShipPrice+(float)$sale;
-                        $regPriceHtml=$fullPrice*$SAR ;
-                        $salePriceHtml=$saleFullPrice*$SAR;
-
-                    }
-                    elseif($item['type'] === 'variable'){
-
-
-                        $minCartonShipPrice=$increasedSARship*$minCbm;
-                        $maxCartonShipPrice=$increasedSARship*$maxCbm;
-                        $minProdShipPrice=$minCartonShipPrice/$minQty;
-                        $maxProdShipPrice=$maxCartonShipPrice/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$SAR;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$SAR;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$SAR;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$SAR;
-
-
-                    }
-
-                    $curHtml='ر.س';
-                }
-                elseif(!empty($cur) && $cur ==='OMR'){
-
-                    // $CartonShipPrice=$increasedOMRship*$Cbm;
-                    // $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                    // $fullPrice=$ProdShipPrice+(float)$regular;
-                    // $saleFullPrice=$ProdShipPrice+(float)$sale;
-                    // $regPriceHtml=$fullPrice* $OMR;
-                    // $salePriceHtml=$saleFullPrice*$OMR;
-                    if($item['type'] === 'simple'){
-
-                        $CartonShipPrice=$increasedOMRship*$Cbm;
-                        $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                        $fullPrice=$ProdShipPrice+(float)$regular;
-                        $saleFullPrice=$ProdShipPrice+(float)$sale;
-                        $regPriceHtml=$fullPrice*$SAR ;
-                        $salePriceHtml=$saleFullPrice*$SAR;
-
-                    }
-                    elseif($item['type'] === 'variable'){
-
-
-                        $minCartonShipPrice=$increasedOMRship*$minCbm;
-                        $maxCartonShipPrice=$increasedOMRship*$maxCbm;
-                        $minProdShipPrice=$minCartonShipPrice/$minQty;
-                        $maxProdShipPrice=$maxCartonShipPrice/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$OMR;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$OMR;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$OMR;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$OMR;
-
-                    }
-                    $curHtml='ر.ع';
-                }
-                elseif(!empty($cur) && $cur ==='IQD'){
-                    if($item['type'] === 'simple'){
-
-                        $CartonShipPrice=$increasedIrqship*$Cbm;
-                        $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                        $fullPrice=$ProdShipPrice+(float)$regular;
-                        $saleFullPrice=$ProdShipPrice+(float)$sale;
-                        $regPriceHtml=$fullPrice*$USD ;
-                        $salePriceHtml=$saleFullPrice*$USD;
-
-                    }
-                    elseif($item['type'] === 'variable'){
-
-
-                        $minCartonShipPrice=$increasedIrqship*$minCbm;
-                        $maxCartonShipPrice=$increasedIrqship*$maxCbm;
-                        $minProdShipPrice=$increasedIrqship/$minQty;
-                        $maxProdShipPrice=$increasedIrqship/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$USD;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$USD;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$USD;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$USD;
-
-                    }
-                    $curHtml='$';
-                }
-                elseif(!empty($cur) && $cur ==='LBP' ){
-                    if($item['type'] === 'simple'){
-
-                        $CartonShipPrice=$increasedLbShip*$Cbm;
-                        $ProdShipPrice=$CartonShipPrice / $cartonQty;
-                        $fullPrice=$ProdShipPrice+(float)$regular;
-                        $saleFullPrice=$ProdShipPrice+(float)$sale;
-                        $regPriceHtml=$fullPrice*$USD ;
-                        $salePriceHtml=$saleFullPrice*$USD;
-
-                    }
-                    elseif($item['type'] === 'variable'){
-
-
-                        $minCartonShipPrice=$increasedLbShip*$minCbm;
-                        $maxCartonShipPrice=$increasedLbShip*$maxCbm;
-                        $minProdShipPrice=$increasedLbShip/$minQty;
-                        $maxProdShipPrice=$increasedLbShip/$maxQty;
-                        //reg Price
-                        $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-                        $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                            $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$USD;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$USD;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$USD;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$USD;
-
-                    }
-                    $curHtml='$';
+                    $CartonShipPrice=$CurValues[$cur]['increasedShipCost']*$Cbm;
+                    $ProdShipPrice=$CartonShipPrice / $cartonQty;
+                    $fullPrice=$ProdShipPrice+(float)$regular;
+                    $saleFullPrice=$ProdShipPrice+(float)$sale;
+                    $regPriceHtml=$fullPrice*$CurValues[$cur]['exhange'] ;
+                    $salePriceHtml=$saleFullPrice*$CurValues[$cur]['exhange'];
 
                 }
-                elseif(!empty($cur) && $cur ==='USD'){
-                    
-                    if($item['type'] === 'simple'){
+                elseif($item['type'] ==='simple' && !array_key_exists($cur,$curArr)){
 
-                        $regPriceHtml=(float)$regular*$USD;
-                        $salePriceHtml=(float)$sale*$USD;
-                    }
-                    elseif($item['type'] === 'variable'){
 
-                        //reg Price
-                        $minRegFullPrice=(float)$minRegPrice;
-                        $maxRegFullPrice=(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=(float)$minSalePrice;
-                            $maxSaleFullPrice=(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        //xhange price
-                        $minRegFullPriceHtml=$minRegFullPrice*$USD;
-                        $maxRegFullPriceHtml=$maxRegFullPrice*$USD;
-                        $minSaleFullPriceHtml=$minSaleFullPrice*$USD;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice*$USD;
-                    }
+                    $CartonShipPrice=$CurValues['random']['increasedShipCost']*$Cbm;
+                    $ProdShipPrice=$CartonShipPrice / $cartonQty;
+                    $fullPrice=$ProdShipPrice+(float)$regular;
+                    $saleFullPrice=$ProdShipPrice+(float)$sale;
+                    $regPriceHtml=$fullPrice*$CurValues['random']['exhange'] ;
+                    $salePriceHtml=$saleFullPrice*$CurValues['random']['exhange'];
 
-                    $curHtml='$';
+
                 }
-                elseif(!empty($cur) && $cur ==='CNY'){
-                    
-                    if($item['type'] === 'simple'){
-
-                        $regPriceHtml=(float)$regular;
-                        $salePriceHtml=(float)$sale;
-
+                elseif($item['type'] === 'variable' && array_key_exists($cur,$curArr)){
+                    $minCartonShipPrice=(float)$CurValues[$cur]['increasedShipCost']*$minCbm;
+                    $maxCartonShipPrice=(float)$CurValues[$cur]['increasedShipCost']*$maxCbm;
+                    $minProdShipPrice=(float)$minCartonShipPrice/$minQty;
+                    $maxProdShipPrice=(float)$maxCartonShipPrice/$maxQty;
+                    //reg Price
+                    $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
+                    $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
+                    //sale price
+                    if($item['on_sale']){
+                        $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
+                        $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
                     }
-                    elseif($item['type'] === 'variable'){
-
-
-                        //reg Price
-                        $minRegFullPrice=(float)$minRegPrice;
-                        $maxRegFullPrice=(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPrice=(float)$minSalePrice;
-                            $maxSaleFullPrice=(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPrice=null;
-                            $maxSaleFullPrice=null;
-                        }
-                        $minRegFullPriceHtml=$minRegFullPrice;
-                        $maxRegFullPriceHtml=$maxRegFullPrice;
-                        $minSaleFullPriceHtml=$minSaleFullPrice;
-                        $maxSaleFullPriceHtml=$maxSaleFullPrice;
+                    else{
+                        $minSaleFullPrice=null;
+                        $maxSaleFullPrice=null;
                     }
+                    //xhange price
+                    $minRegFullPriceHtml=$minRegFullPrice*$CurValues[$cur]['exhange'];
+                    $maxRegFullPriceHtml=$maxRegFullPrice*$CurValues[$cur]['exhange'];
+                    $minSaleFullPriceHtml=$minSaleFullPrice*$CurValues[$cur]['exhange'];
+                    $maxSaleFullPriceHtml=$maxSaleFullPrice*$CurValues[$cur]['exhange'];
+                }
+                elseif($item['type'] === 'variable' && !array_key_exists($cur,$curArr)){
+                    $minCartonShipPrice=(float)$CurValues['random']['increasedShipCost']*$minCbm;
+                    $maxCartonShipPrice=(float)$CurValues['random']['increasedShipCost']*$maxCbm;
+                    $minProdShipPrice=(float)$minCartonShipPrice/$minQty;
+                    $maxProdShipPrice=(float)$maxCartonShipPrice/$maxQty;
+                    //reg Price
+                    $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
+                    $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
+                    //sale price
+                    if($item['on_sale']){
+                        $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
+                        $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
+                    }
+                    else{
+                        $minSaleFullPrice=null;
+                        $maxSaleFullPrice=null;
+                    }
+                    //xhange price
+                    $minRegFullPriceHtml=$minRegFullPrice*$CurValues['random']['exhange'];
+                    $maxRegFullPriceHtml=$maxRegFullPrice*$CurValues['random']['exhange'];
+                    $minSaleFullPriceHtml=$minSaleFullPrice*$CurValues['random']['exhange'];
+                    $maxSaleFullPriceHtml=$maxSaleFullPrice*$CurValues['random']['exhange'];
+                }
 
-                    $curHtml='¥';
-
+                //Cur Symbol
+                if(array_key_exists($cur,$curArr)){
+                    $curHtml=$curArr[$cur]['symbol'];
                 }
                 else{
-
-                    if($item['type'] === 'simple'){
-
-                        $regPriceHtml=(float)$regular*$USD;
-                        $salePriceHtml=(float)$sale*$USD;
-                        
-                    }
-                    elseif($item['type'] === 'variable'){
-
-                        //reg Price
-                        $minRegFullPriceHtml=(float)$minRegPrice;
-                        $maxRegFullPriceHtml=(float)$maxRegPrice;
-                        //sale price
-                        if($item['on_sale']){
-                            $minSaleFullPriceHtml=(float)$minSalePrice;
-                            $maxSaleFullPriceHtml=(float)$maxSalePrice;
-                        }
-                        else{
-                            $minSaleFullPriceHtml=null;
-                            $maxSaleFullPriceHtml=null;
-                        }
-                    }
-                    $curHtml='$';
-
+                    $curHtml=$curArr['random']['symbol'];
                 }
 
                 //Public Html Generate 
@@ -552,35 +305,71 @@ class ApiController extends Controller
         };
        //end Product By 
 
+       //Set Shipment Price
+       switch ($ship) {
+        case "SAR":
+            $shipCost=2300;
+            break;
+        case "OMR":
+            $shipCost=985;
+            break;
+        case "YMN":
+            $shipCost=985;
+            break;
+        case "LBN":
+            $shipCost=1935; //OMR
+            break;
+        case "IRQ":
+            $shipCost=1550;
+            break;
+        case "UAE":
+            $shipCost=960;
+            break;
+        case "PLS":
+            $shipCost=1935; //Lbn
+            break;
+        default:
+            $shipCost=0;
+    }
+
+    // $AEDship=960;
+    // $SARship=2300;
+    // $OMRship=985;
+    // $IrqShip=1550;
+    // $LbShip=1935;
+    
+    $shipPerc=0.2;
+    $finalShipCost=$shipCost*$shipPerc+$shipCost;
+
         //Get Products By Tag
-        $ProdByTax=getProdBy(699,12,$cur,'tax');
-        $ProdByTax0=getProdBy(718,9,$cur,'tax');
-        $ProdByTax1=getProdBy(720,8,$cur,'tax');
-        $ProdByTax2=getProdBy(695,12,$cur,'tax');
-        $ProdByTax3=getProdBy(731,12,$cur,'tax');
-        $ProdByTax4=getProdBy(705,12,$cur,'tax');
-        $ProdByTax5=getProdBy(723,10,$cur,'tax');
-        $ProdByTax6=getProdBy(717,12,$cur,'tax');
-        $ProdByTax7=getProdBy(716,12,$cur,'tax');
-        $ProdByTax8=getProdBy(703,12,$cur,'tax');
+        $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tax');
+        $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tax');
+        $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tax');
+        $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tax');
+        $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tax');
+        $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tax');
+        $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tax');
+        $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tax');
+        $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tax');
+        $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tax');
        
        
         // return $MostPop=getProdBy(755,12,$cur,'tax');
 
         //Prod By Box
-        $ProdByBox=getProdBy(696,4,$cur,'tax'); 
+        $ProdByBox=getProdBy(696,4,$cur,$finalShipCost,'tax'); 
 
         //get ProdInBox
-        $ProdInBox=getProdBy(704,4,$cur,'tax'); //Prod Sticker
-        $ProdInBox0=getProdBy(705,4,$cur,'tax'); //Prod DecIns
-        $ProdInBox1=getProdBy(707,4,$cur,'tax'); //Prod tag
-        $ProdInBox2=getProdBy(703,4,$cur,'tax'); //Prod DecRope
+        $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tax'); //Prod Sticker
+        $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tax'); //Prod DecIns
+        $ProdInBox1=getProdBy(707,4,$cur,$finalShipCost,'tax'); //Prod tag
+        $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tax'); //Prod DecRope
         
         //get Recent Products 
-        $getRecentProds=getProdBy(0,8,$cur,'newest');
+        $getRecentProds=getProdBy(0,8,$cur,$finalShipCost,'newest');
 
         //get Offers Prods
-        $offers=getProdBy(0,12,$cur,'offers');
+        $offers=getProdBy(0,12,$cur,$finalShipCost,'offers');
 
         //response
         //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
