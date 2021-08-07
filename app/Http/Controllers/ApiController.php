@@ -240,7 +240,15 @@ class ApiController extends Controller
                         $price_html='<span =""><del aria-hidden="true"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>' .number_format((float)$regPriceHtml,2). '</span></del> <ins><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$salePriceHtml,2) . ' </span></ins></span>';
                     }
                     else{
-                        $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> - ' . number_format((float)$minRegFullPriceHtml,2) . ' </span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$maxRegFullPriceHtml,2) . ' </span></span>';
+
+                        if($minRegFullPriceHtml === $maxRegFullPriceHtml){
+                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'</span>' . number_format((float)$minRegFullPriceHtml,2) . ' </span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>' . number_format((float)$maxRegFullPriceHtml,2) . '</span></span>';
+                        }
+                        else{
+                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$minRegFullPriceHtml,2) . ' </span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>'.number_format((float)$maxRegFullPriceHtml,2).'</span></span>';
+                        }
+
+                        
                     }
 
                 }
@@ -314,7 +322,7 @@ class ApiController extends Controller
             $shipCost=2200;
             break;
         case "SYR":
-            $shipCost=2200;
+            $shipCost=960; //AED
             break;
         case "OMR":
             $shipCost=985;
@@ -361,10 +369,9 @@ class ApiController extends Controller
        
        
         $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tax');
-
+        
         //Prod By Box
-        $ProdByBox=getProdBy(696,4,$cur,$finalShipCost,'tax'); 
-
+        $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tax'); 
         //get ProdInBox
         $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tax'); //Prod Sticker
         $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tax'); //Prod DecIns
@@ -383,6 +390,7 @@ class ApiController extends Controller
         //response
         //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
         //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByBox'=>$ProdByBox,'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+        
         $response=[
             'Categories'=>$transCat,'ProdByTax'=>$ProdByTax,
             'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,
