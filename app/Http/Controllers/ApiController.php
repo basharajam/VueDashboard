@@ -318,28 +318,28 @@ class ApiController extends Controller
 
        //Set Shipment Price
        switch ($ship) {
-        case "SAR":
+        case "SA":
             $shipCost=2200;
             break;
-        case "SYR":
+        case "SY":
             $shipCost=960; //AED
             break;
-        case "OMR":
+        case "OM":
             $shipCost=985;
             break;
-        case "YMN":
+        case "YE":
             $shipCost=985;
             break;
-        case "LBN":
-            $shipCost=1935; //OMR
+        case "LB":
+            $shipCost=1935; //OM
             break;
-        case "IRQ":
+        case "IQ":
             $shipCost=1550;
             break;
-        case "UAE":
+        case "AE":
             $shipCost=960;
             break;
-        case "PLS":
+        case "PS":
             $shipCost=1935; //Lbn
             break;
         default:
