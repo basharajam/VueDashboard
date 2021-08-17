@@ -241,10 +241,10 @@ class ApiController extends Controller
                     else{
 
                         if($minRegFullPriceHtml === $maxRegFullPriceHtml){
-                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'</span>' . number_format((float)$minRegFullPriceHtml,2) . ' </span>  <span>-</span> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>' . number_format((float)$maxRegFullPriceHtml,2) . '</span></span>';
+                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'</span>' . number_format((float)$minRegFullPriceHtml,2) . ' </span>  <span style="font-weight: bold;color:black;font-size: 16px;">-</span> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>' . number_format((float)$maxRegFullPriceHtml,2) . '</span></span>';
                         }
                         else{
-                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$minRegFullPriceHtml,2) . ' </span> <span>-</span> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>'.number_format((float)$maxRegFullPriceHtml,2).'</span></span>';
+                            $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$minRegFullPriceHtml,2) . ' </span> <span style="font-weight: bold;color:black;font-size: 16px;">-</span> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>'.number_format((float)$maxRegFullPriceHtml,2).'</span></span>';
                         }
 
                         
@@ -364,7 +364,7 @@ class ApiController extends Controller
         $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tag');
         $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tag');
         $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tag');
-       
+        $ProdByTax9=getProdBy(757,12,$cur,$finalShipCost,'tag'); 
        
         $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tag');
         
@@ -397,9 +397,10 @@ class ApiController extends Controller
             'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,
             'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,
             'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,
-            'ProdByTax8'=>$ProdByTax8,'ProdByBox'=>$ProdByBox,
-            'RecentProds'=>$getRecentProds,'Offers'=>$offers,
-            'BestSell'=>$BestSell,'MostPop'=>$MostPop
+            'ProdByTax8'=>$ProdByTax8,'ProdByTax9'=>$ProdByTax9,
+            'ProdByBox'=>$ProdByBox,'RecentProds'=>$getRecentProds,
+            'Offers'=>$offers,'BestSell'=>$BestSell,
+            'MostPop'=>$MostPop
         ];
 
         return response()->json($response, 200);
