@@ -25,7 +25,7 @@ class ApiController extends Controller
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
         $getTerm=Term::whereIn('term_id',$getCat)->get();
         $transCat=$getTerm->map(function($item){
-       
+            return $item;
             if(!empty($item->taxonomy->image->guid)){
                 $img=$item->taxonomy->image->guid;
             }
@@ -46,7 +46,7 @@ class ApiController extends Controller
         {
 
 
-            if($type ==='tax'){
+            if($type ==='tag'){
                 //get Relations
                 $Tax0=TermRelation::where('term_taxonomy_id',TermTaxonomy::where('term_id',$tax)->pluck('term_taxonomy_id'))->pluck('object_id');
                 //get Products
@@ -351,32 +351,31 @@ class ApiController extends Controller
     // $OMRship=985;
     // $IrqShip=1550;
     // $LbShip=1935;
-    
     $shipPerc=0.2;
     $finalShipCost=$shipCost*$shipPerc+$shipCost;
 
         //Get Products By Tag
-        $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tax');
-        $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tax');
-        $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tax');
-        $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tax');
-        $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tax');
-        $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tax');
-        $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tax');
-        $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tax');
-        $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tax');
-        $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tax');
+        $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tag');
+        $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tag');
+        $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tag');
+        $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tag');
+        $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tag');
+        $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tag');
+        $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tag');
+        $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tag');
+        $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tag');
+        $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tag');
        
        
-        $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tax');
+        $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tag');
         
         //Prod By Box
-        $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tax'); 
+        $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tag'); 
         //get ProdInBox
-        $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tax'); //Prod Sticker
-        $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tax'); //Prod DecIns
-        $ProdInBox1=getProdBy(707,4,$cur,$finalShipCost,'tax'); //Prod tag
-        $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tax'); //Prod DecRope
+        $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tag'); //Prod Sticker
+        $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tag'); //Prod DecIns
+        $ProdInBox1=getProdBy(757,4,$cur,$finalShipCost,'tag'); //Prod tag
+        $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tag'); //Prod DecRope
         
         //get Recent Products 
         $getRecentProds=getProdBy(0,8,$cur,$finalShipCost,'newest');
@@ -385,7 +384,7 @@ class ApiController extends Controller
         $offers=getProdBy(0,12,$cur,$finalShipCost,'offers');
 
         //Best Sell Prods
-        $BestSell=getProdBy(719,12,$cur,$finalShipCost,'tax');
+        $BestSell=getProdBy(719,12,$cur,$finalShipCost,'tag');
 
         //response
         //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];

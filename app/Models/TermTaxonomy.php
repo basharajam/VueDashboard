@@ -3,7 +3,7 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 // use App\Models\WP\TermRelation;
-// use App\Models\WP\TermMeta;
+use App\Models\attachment;
 class TermTaxonomy extends Model
 {
     protected $table="wpdm_term_taxonomy";
@@ -47,7 +47,7 @@ class TermTaxonomy extends Model
     {
         $image_post_meta =  TermMeta::where('term_id',$this->term_id)->where('meta_key','thumbnail_id')->first();
         if($image_post_meta){
-            $image_post =  Post::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
+            $image_post =  attachment::where('ID',$image_post_meta->meta_value)->orderBy('ID','desc')->first();
             if($image_post){
                 return $image_post;
             }

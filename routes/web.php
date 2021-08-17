@@ -16,3 +16,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+
+Route::prefix('Cpanel')->group(function () {
+    
+
+   Route::get('/',['uses'=>'App\Http\Controllers\CpanelController@MainGet']); 
+
+   Route::prefix('layouts')->group(function () {
+    
+    route::get('landingPage',['uses'=>'App\Http\Controllers\CpanelController@LandigGet','as'=>'landingLayoutGet']);
+
+   });
+});
