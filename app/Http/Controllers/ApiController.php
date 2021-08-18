@@ -8,6 +8,7 @@ use App\Models\PostV;
 use App\Models\TermTaxonomy;
 use App\Models\TermRelation;
 use App\Models\Term;
+use App\Models\VueLayouts;
 class ApiController extends Controller
 {
     //
@@ -15,33 +16,10 @@ class ApiController extends Controller
     public function getProds($cur,$ship)
     {
 
-
         set_time_limit(0);
 
-
-
-
-        //getCategories
-        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
-        $getTerm=Term::whereIn('term_id',$getCat)->get();
-        $transCat=$getTerm->map(function($item){
-            if(!empty($item->taxonomy->image->guid)){
-                $img=$item->taxonomy->image->guid;
-            }
-            else{
-                $img='';
-            }
-            return [
-                'name'=>$item->name,
-                'slug'=>$item->slug,
-                'image'=>(object)array('src'=>$img)
-            ];
-
-        });
-
-
         //get Products By Tag id
-        function getProdBy($tax,$limit,$cur,$ship,$type)
+        function getProdBy($tax,$limit,$cur,$ship,$type,$title)
         {
 
 
@@ -62,7 +40,7 @@ class ApiController extends Controller
             }
             
             //Transform Product Object
-            $trans=$ProdBy->map(function($item) use ($cur,$ship) {
+            $trans=$ProdBy->map(function($item) use ($cur,$ship,$limit,$title) {
                 
                 //return $item;
 
@@ -310,7 +288,7 @@ class ApiController extends Controller
 
             });
 
-            return $trans;
+            return ['items'=>$trans,'count'=>$limit,'title'=>$title];
 
         };
        //end Product By 
@@ -353,57 +331,96 @@ class ApiController extends Controller
     $shipPerc=0.2;
     $finalShipCost=$shipCost*$shipPerc+$shipCost;
 
+
+        
+     
+        $response=array();
+
+        //getCategories
+        $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
+        $getTerm=Term::whereIn('term_id',$getCat)->get();
+        $transCat=$getTerm->map(function($item){
+            if(!empty($item->taxonomy->image->guid)){
+                $img=$item->taxonomy->image->guid;
+            }
+            else{
+                $img='';
+            }
+            return [
+                'name'=>$item->name,
+                'slug'=>$item->slug,
+                'image'=>(object)array('src'=>$img)
+            ];
+
+        });
+        $response['Categories'] = $transCat;
+        
+
         //Get Products By Tag
-        $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tag');
-        $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tag');
-        $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tag');
-        $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tag');
-        $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tag');
-        $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tag');
-        $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tag');
-        $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tag');
-        $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tag');
-        $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tag');
-        $ProdByTax9=getProdBy(757,12,$cur,$finalShipCost,'tag'); 
-       
-        $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tag');
-        
-        //Prod By Box
-        $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tag'); 
-        //get ProdInBox
-        $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tag'); //Prod Sticker
-        $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tag'); //Prod DecIns
-        $ProdInBox1=getProdBy(757,4,$cur,$finalShipCost,'tag'); //Prod tag
-        $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tag'); //Prod DecRope
-        
-        //get Recent Products 
-        $getRecentProds=getProdBy(0,8,$cur,$finalShipCost,'newest');
+        $getLayoutsLists=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdList'])->get();
+        foreach ($getLayoutsLists as $item) {
+            $ProdByTax=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title']);
+            $response[$item['compName']] = $ProdByTax;
+        }
 
-        //get Offers Prods
-        $offers=getProdBy(0,12,$cur,$finalShipCost,'offers');
-
-        //Best Sell Prods
-        $BestSell=getProdBy(719,12,$cur,$finalShipCost,'tag');
-
-        //response
-        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
-        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByBox'=>$ProdByBox,'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
-        
-        $response=[
-            'Categories'=>$transCat,'ProdByTax'=>$ProdByTax,
-            'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,
-            'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,
-            'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,
-            'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,
-            'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,
-            'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,
-            'ProdByTax8'=>$ProdByTax8,'ProdByTax9'=>$ProdByTax9,
-            'ProdByBox'=>$ProdByBox,'RecentProds'=>$getRecentProds,
-            'Offers'=>$offers,'BestSell'=>$BestSell,
-            'MostPop'=>$MostPop
-        ];
+        //get ProdIn Box
+        $getLayoutsLists0=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdInBox'])->get();
+        foreach ($getLayoutsLists0 as $item) {
+            $ProdInBox=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title']);
+            $response[$item['compName']] = $ProdInBox;
+        }
 
         return response()->json($response, 200);
+
+
+        // $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tag');
+        // $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tag');
+        // $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tag');
+        // $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tag');
+        // $ProdByTax9=getProdBy(757,12,$cur,$finalShipCost,'tag'); 
+       
+        // $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tag');
+
+        //get Recent Products 
+        //$getRecentProds=getProdBy(0,8,$cur,$finalShipCost,'newest');
+        
+        // //get Offers Prods
+        // $offers=getProdBy(0,12,$cur,$finalShipCost,'offers');
+
+        //Prod By Box
+        // $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tag'); 
+        //get ProdInBox
+        // $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tag'); //Prod Sticker
+        // $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tag'); //Prod DecIns
+        // $ProdInBox1=getProdBy(757,4,$cur,$finalShipCost,'tag'); //Prod tag
+        // $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tag'); //Prod DecRope
+        
+        //Best Sell Prods
+        // $BestSell=getProdBy(719,12,$cur,$finalShipCost,'tag');
+
+        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByBox'=>$ProdByBox,'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
+        //response
+        // $response=[
+        //     'Categories'=>$transCat,'ProdByTax'=>$ProdByTax,
+        //     'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,
+        //     'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,
+        //     'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,
+        //     'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,
+        //     'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,
+        //     'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,
+        //     'ProdByTax8'=>$ProdByTax8,'ProdByTax9'=>$ProdByTax9,
+        //     'ProdByBox'=>$ProdByBox,'RecentProds'=>$getRecentProds,
+        //     'Offers'=>$offers,'BestSell'=>$BestSell,
+        //     'MostPop'=>$MostPop
+        // ];
+
 
     }
 

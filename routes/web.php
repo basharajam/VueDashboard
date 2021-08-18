@@ -26,7 +26,9 @@ Route::prefix('Cpanel')->group(function () {
 
    Route::prefix('layouts')->group(function () {
     
-    route::get('landingPage',['uses'=>'App\Http\Controllers\CpanelController@LandigGet','as'=>'landingLayoutGet']);
+    route::get('landingPage',['uses'=>'App\Http\Controllers\CpanelController@LandingGet','as'=>'landingLayoutGet']);
+
+    route::post('updateSectionLanding',['uses'=>'App\Http\Controllers\CpanelController@updateSectionLanding','as'=>'updateSectionLanding']);
 
    });
 });
