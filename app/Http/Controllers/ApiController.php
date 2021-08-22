@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Post;
 use App\Models\PostV;
 use App\Models\TermTaxonomy;
 use App\Models\TermRelation;
 use App\Models\Term;
 use App\Models\VueLayouts;
+use App\Models\WpUser;
+use App\Models\otp;
 class ApiController extends Controller
 {
     //
@@ -371,57 +374,6 @@ class ApiController extends Controller
         }
 
         return response()->json($response, 200);
-
-
-        // $ProdByTax=getProdBy(699,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax0=getProdBy(718,9,$cur,$finalShipCost,'tag');
-        // $ProdByTax1=getProdBy(720,8,$cur,$finalShipCost,'tag');
-        // $ProdByTax2=getProdBy(695,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax3=getProdBy(731,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax4=getProdBy(705,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax5=getProdBy(723,10,$cur,$finalShipCost,'tag');
-        // $ProdByTax6=getProdBy(717,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax7=getProdBy(716,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax8=getProdBy(703,12,$cur,$finalShipCost,'tag');
-        // $ProdByTax9=getProdBy(757,12,$cur,$finalShipCost,'tag'); 
-       
-        // $MostPop=getProdBy(755,12,$cur,$finalShipCost,'tag');
-
-        //get Recent Products 
-        //$getRecentProds=getProdBy(0,8,$cur,$finalShipCost,'newest');
-        
-        // //get Offers Prods
-        // $offers=getProdBy(0,12,$cur,$finalShipCost,'offers');
-
-        //Prod By Box
-        // $ProdByBox=getProdBy(696,6,$cur,$finalShipCost,'tag'); 
-        //get ProdInBox
-        // $ProdInBox=getProdBy(704,4,$cur,$finalShipCost,'tag'); //Prod Sticker
-        // $ProdInBox0=getProdBy(705,4,$cur,$finalShipCost,'tag'); //Prod DecIns
-        // $ProdInBox1=getProdBy(757,4,$cur,$finalShipCost,'tag'); //Prod tag
-        // $ProdInBox2=getProdBy(703,4,$cur,$finalShipCost,'tag'); //Prod DecRope
-        
-        //Best Sell Prods
-        // $BestSell=getProdBy(719,12,$cur,$finalShipCost,'tag');
-
-        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
-        //$response=['Categories'=>$transCat,'ProdByTax'=>$ProdByTax,'ProdByBox'=>$ProdByBox,'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,'ProdByTax8'=>$ProdByTax8];
-        //response
-        // $response=[
-        //     'Categories'=>$transCat,'ProdByTax'=>$ProdByTax,
-        //     'ProdInBox'=>$ProdInBox,'ProdInBox0'=>$ProdInBox0,
-        //     'ProdInBox1'=>$ProdInBox1,'ProdInBox2'=>$ProdInBox2,
-        //     'ProdByTax0'=>$ProdByTax0,'ProdByTax1'=>$ProdByTax1,
-        //     'ProdByTax2'=>$ProdByTax2,'ProdByTax3'=>$ProdByTax3,
-        //     'ProdByTax4'=>$ProdByTax4,'ProdByTax5'=>$ProdByTax5,
-        //     'ProdByTax6'=>$ProdByTax6,'ProdByTax7'=>$ProdByTax7,
-        //     'ProdByTax8'=>$ProdByTax8,'ProdByTax9'=>$ProdByTax9,
-        //     'ProdByBox'=>$ProdByBox,'RecentProds'=>$getRecentProds,
-        //     'Offers'=>$offers,'BestSell'=>$BestSell,
-        //     'MostPop'=>$MostPop
-        // ];
-
-
     }
 
     public function test()
@@ -431,6 +383,48 @@ class ApiController extends Controller
         $offers=Post::where('on_sale',true)->limit(1)->get();
         //$getProds->categories;
         return response()->json($offers, 200);
+    }
+
+
+    public function validateCreds($type,$value)
+    {
+        //validate params 
+        if(!empty($type) && !empty($value)){
+
+            //Check Type 
+            if($type === 'mail'){
+
+                //Check value
+                $Check=WpUser::where('user_email',$value)->count();
+            }
+            elseif($type ==='username'){
+
+                //check value
+                $Check=WpUser::where('user_login',$value)->count();
+            }
+            elseif($type === 'number'){
+
+                //check value 
+                $Check=otp::where('mobileno',$value)->count();
+            }
+
+            if($Check > 0 ){
+                return response()->json(['success'=>false,'message'=>'Exists'], 400);
+            }
+            else{
+                return response()->json(['success'=>true,'message'=>'Done'], 200);
+            }
+
+        }
+        else{
+            return response()->json(['success'=>false,'message'=>'validate'], 400);
+        }
+ 
+
+         
+
+        //response 
+
     }
 
 }
