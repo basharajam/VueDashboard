@@ -22,4 +22,4 @@ Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController
 
 Route::get('/test',['uses'=>'App\Http\Controllers\ApiController@test']);
 
-route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds']);
+route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds'])->middleware('cors');
