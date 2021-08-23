@@ -17,5 +17,5 @@ class VueLayouts extends Model
     public $timestamps = false;
     
     
-    protected $fillable=['title','value','type','wherePage','compName','compType','itemNum'];
+    protected $fillable=['title','value','type','wherePage','compName','compType','itemNum','link'];
 }

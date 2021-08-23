@@ -27,6 +27,9 @@
                         <div class="mb-3">
                             <input type="number" id="value{{ $item['itemNum']}}" placeholder="Items number" name="ItemNumI" value="{{ $item['itemNum'] }}" class="form-control" >
                         </div>
+                        <div class="mb-3">
+                            <input type="text" id="value" placeholder="Link" name="linkI" value="" class="form-control" >
+                        </div>
                         <input type="hidden" name="compNameI" value="{{ $item['compName'] }}">
                         <div class="mb-3">
                             <button type="submit" class="btn btn-primary">Submit</button>

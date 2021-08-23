@@ -35,13 +35,15 @@ class CpanelController extends Controller
             'SectionTitleI'=>'required',
             'SectionValI'=>'required',
             'compNameI'=>'required',
-            'ItemNumI'=>'required|not_in:0'
+            'ItemNumI'=>'required|not_in:0',
+            'linkI'=>'max:225',
         ]);
 
         $update=[
             'title'=>$validate['SectionTitleI'],
             'value'=>$validate['SectionValI'],
-            'itemNum'=>$validate['ItemNumI']
+            'itemNum'=>$validate['ItemNumI'],
+            'link'=>$validate['linkI']
         ];
 
         $getSection=Vuelayouts::where('compName',$validate['compNameI'])->update($update);

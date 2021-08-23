@@ -22,7 +22,7 @@ class ApiController extends Controller
         set_time_limit(0);
 
         //get Products By Tag id
-        function getProdBy($tax,$limit,$cur,$ship,$type,$title)
+        function getProdBy($tax,$limit,$cur,$ship,$type,$title,$link)
         {
 
 
@@ -43,7 +43,7 @@ class ApiController extends Controller
             }
             
             //Transform Product Object
-            $trans=$ProdBy->map(function($item) use ($cur,$ship,$limit,$title) {
+            $trans=$ProdBy->map(function($item) use ($cur,$ship,$limit,$title,$link) {
                 
                 //return $item;
 
@@ -291,7 +291,7 @@ class ApiController extends Controller
 
             });
 
-            return ['items'=>$trans,'count'=>$limit,'title'=>$title];
+            return ['items'=>$trans,'count'=>$limit,'title'=>$title,'link'=>$link];
 
         };
        //end Product By 
@@ -362,14 +362,14 @@ class ApiController extends Controller
         //Get Products By Tag
         $getLayoutsLists=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdList'])->get();
         foreach ($getLayoutsLists as $item) {
-            $ProdByTax=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title']);
+            $ProdByTax=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link']);
             $response[$item['compName']] = $ProdByTax;
         }
 
         //get ProdIn Box
         $getLayoutsLists0=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdInBox'])->get();
         foreach ($getLayoutsLists0 as $item) {
-            $ProdInBox=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title']);
+            $ProdInBox=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link']);
             $response[$item['compName']] = $ProdInBox;
         }
 
