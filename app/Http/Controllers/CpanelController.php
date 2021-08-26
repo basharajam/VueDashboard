@@ -22,9 +22,10 @@ class CpanelController extends Controller
     {
         //
         //vue Layouts
-        $getLandingLayout=VueLayouts::where('wherePage','landing')->get();
+        $getLandingLayout=VueLayouts::where('wherePage','landing')->orderBy('sort', 'asc')->where('compType','!=','ProdInBox')->get();
+        $getProdInBox=VueLayouts::where('wherePage','landing')->where('compType','ProdInBox')->get();
 
-        return view('Cpanel.layouts.landing',['Layout'=>$getLandingLayout]);
+        return view('Cpanel.layouts.landing',['Layout'=>$getLandingLayout,'ProdInBox'=>$getProdInBox]);
     }
 
     public function updateSectionLanding(Request $request)
