@@ -28,7 +28,17 @@ Route::prefix('Cpanel')->group(function () {
     
     route::get('landingPage',['uses'=>'App\Http\Controllers\CpanelController@LandingGet','as'=>'landingLayoutGet']);
 
+    route::get('ProdOnePage',['uses'=>'App\Http\Controllers\CpanelController@ProdOneGet','as'=>'ProdOneLayoutGet']);
+
+    route::get('ProdByCat',['uses'=>'App\Http\Controllers\CpanelController@ProdByCatGet','as'=>'ProdByCat']);
+
     route::post('updateSectionLanding',['uses'=>'App\Http\Controllers\CpanelController@updateSectionLanding','as'=>'updateSectionLanding']);
+
+    route::post('updateSort',['uses'=>'App\Http\Controllers\CpanelController@updateSort','as'=>'updateSort']);
+
+    route::post('SaveComp',['uses'=>'App\Http\Controllers\CpanelController@SaveComp','as'=>'SaveComp']);
+
+    route::post('DelComp',['uses'=>'App\Http\Controllers\CpanelController@DelComp','as'=>'DelComp']);
 
    });
 });

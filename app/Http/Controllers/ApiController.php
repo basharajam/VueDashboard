@@ -9,6 +9,7 @@ use App\Models\PostV;
 use App\Models\TermTaxonomy;
 use App\Models\TermRelation;
 use App\Models\Term;
+use App\Models\PostAll;
 use App\Models\VueLayouts;
 use App\Models\WpUser;
 use App\Models\otp;
@@ -22,9 +23,8 @@ class ApiController extends Controller
         set_time_limit(0);
 
         //get Products By Tag id
-        function getProdBy($tax,$limit,$cur,$ship,$type,$title,$link)
+        function getProdBy($tax,$limit,$cur,$ship,$type,$title,$link,$compType,$compName,$Display,$mobileDisplay)
         {
-
 
             if($type ==='tag'){
                 //get Relations
@@ -43,7 +43,7 @@ class ApiController extends Controller
             }
             
             //Transform Product Object
-            $trans=$ProdBy->map(function($item) use ($cur,$ship,$limit,$title,$link) {
+            $trans=$ProdBy->map(function($item) use ($tax,$cur,$ship,$limit,$title,$link,$compType,$compName,$Display,$mobileDisplay) {
                 
                 //return $item;
 
@@ -291,7 +291,7 @@ class ApiController extends Controller
 
             });
 
-            return ['items'=>$trans,'count'=>$limit,'title'=>$title,'link'=>$link];
+            return ['items'=>$trans,'count'=>$limit,'title'=>$title,'link'=>$link,'type'=>$compType,'value'=>$tax,'name'=>$compName,'Display'=>$Display,'mobileDisplay'=>$mobileDisplay];
 
         };
        //end Product By 
@@ -359,22 +359,51 @@ class ApiController extends Controller
         $response['Categories'] = $transCat;
         
 
-        //Get Products By Tag
-        $getLayoutsLists=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdList'])->get();
-        foreach ($getLayoutsLists as $item) {
-            $ProdByTax=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link']);
-            $response[$item['compName']] = $ProdByTax;
+        function responseLayout($data,$cur,$finalShipCost)
+        {
+
+            $arr=array();
+            foreach ($data as $item) {
+
+                if($item['compType'] === 'ProdList' ){
+    
+                    $ProdByTax=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
+                    array_push($arr,$ProdByTax);
+    
+                }
+                elseif($item['compType'] === 'banner'){
+                    $cmpArr=array('items'=>null,'count'=>$item['itemNum'],'title'=>$item['title'],'link'=>$item['link'],'type'=>$item['compType'],'value'=>$item['value'],'name'=>$item['compName'],'Display'=>$item['Display'],'mobileDisplay'=>$item['mobileDisplay']);
+                    array_push($arr,$cmpArr);
+                }
+                elseif($item['compType'] === 'ProdInBox'){
+                    $ProdInBox=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
+                    array_push($arr,$ProdInBox);
+                }
+                //$response['items'] = $;
+            }
+
+            return $arr;
         }
 
-        //get ProdIn Box
-        $getLayoutsLists0=VueLayouts::where(['wherePage'=>'landing','compType'=>'ProdInBox'])->get();
-        foreach ($getLayoutsLists0 as $item) {
-            $ProdInBox=getProdBy($item['value'],$item['itemNum'],$cur,$finalShipCost,$item['type'],$item['title'],$item['link']);
-            $response[$item['compName']] = $ProdInBox;
-        }
+
+
+        //Get Components Desktop
+        $getLayoutsLists=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+        $DesktopResponse=responseLayout($getLayoutsLists,$cur,$finalShipCost);
+        $getLayoutsListsMobile=VueLayouts::where('wherePage','landing')->where('mobileDisplay','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+        $mobileResponse=responseLayout($getLayoutsListsMobile,$cur,$finalShipCost);
+        $ProdInBox=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','ProdInBox')->orderBy('sort','asc')->get();           
+        $ProdInBoxResponse=responseLayout($ProdInBox,$cur,$finalShipCost);
+
+        $response['desktop'] = $DesktopResponse;
+        $response['mobile'] = $mobileResponse;
+        $response['ProdInBox'] = $ProdInBoxResponse;
 
         return response()->json($response, 200);
     }
+
+
+
 
     public function test()
     {
@@ -419,12 +448,53 @@ class ApiController extends Controller
         else{
             return response()->json(['success'=>false,'message'=>'validate'], 400);
         }
- 
+    }
 
-         
+    
+    public function ProdOne($cat,$id,$cur,$ship)
+    {
 
-        //response 
+        
+        //validate params
+        if(!empty($cat) && !empty($id)){
 
+            //Check Category 
+                //get Id Of Category 
+                $getCat=Term::where('name',$cat)->first();
+                
+                //Check Category
+                if(!empty($getCat)){
+                    $CheckCat=TermTaxonomy::where('term_id',$getCat['term_id'])->where('taxonomy','product_cat')->first();
+                }
+                else{
+                    $CheckCat=null;
+                }
+
+
+            //Check Product
+
+                //Check Product By Product TYpe
+                $postTypes=[ 'product','product_variation'];
+                $CheckProd=PostAll::where('ID',$id)->whereIn('post_type',$postTypes)->first();
+                
+            
+            if(isset($CheckCat) && isset($CheckProd)){
+                return $CheckProd;
+            }
+            else{
+                 return response()->json(null, 403);
+            }
+        }
+        else{
+            return response()->json(null, 403);
+        }
+
+
+        //Check Relation Between Category And Product 
+
+        //Set Shipment And Price 
+
+        //Response
     }
 
 }

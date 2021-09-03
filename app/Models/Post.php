@@ -16,6 +16,8 @@ class Post extends Corcel
 
     protected $connection = 'wordpress';
 
+    protected $postType='product';
+
 
     protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
 

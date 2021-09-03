@@ -20,6 +20,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@getProds']);
 
+Route::post('/getLayout',['uses'=>'App\Http\Controllers\CpanelController@getLayout','as'=>'getLayout']);
+
+
 Route::get('/test',['uses'=>'App\Http\Controllers\ApiController@test']);
 
 route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds'])->middleware('cors');
+
+route::get('/ProdOne/{cat}/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@ProdOne']);

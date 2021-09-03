@@ -16,6 +16,8 @@
                 <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('landingLayoutGet') }}">Landing page </a>
+                        <a class="nav-link" href="{{ route('ProdOneLayoutGet') }}">Product One Page </a>
+                        <a class="nav-link" href="{{ route('ProdByCat') }}">Products By Category Page </a>
                         {{-- <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a> --}}
                     </nav>
                 </div>
