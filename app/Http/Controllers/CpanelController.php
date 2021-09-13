@@ -91,13 +91,14 @@ class CpanelController extends Controller
     }
     public function updateSort(Request $request)
     {
-        //validate 
-
+        //validate
         //return $request->all();
         $NewSort=$request->input('sortArr');
         $ids=$request->input('idArr');
         $type=$request->input('type');
-   
+        
+        if(!empty($type) && count($ids) > 0 && count($NewSort)){
+
             foreach ($NewSort as $key=>$item ) {
                 $getSec=VueLayouts::find($ids[$key]);
                 if($type=='desktop'){
@@ -107,8 +108,15 @@ class CpanelController extends Controller
                     $update=$getSec->update(['sortMobile'=>$item]);
                 }
             }
-
+    
             return response()->json(['success'=>true], 200);
+
+        }
+        else{
+            return response()->json(['success'=>false], 400);
+
+        }
+   
 
     }
 
@@ -193,9 +201,10 @@ class CpanelController extends Controller
     {
         //get Layout Items Where compWhere = ProdByCat
 
-        $getComp=VueLayouts::where('wherePage','ProdByCat')->get();
+        $getComp=VueLayouts::where('wherePage','ProdByCat')->orderBy('sort','asc')->get();
+        $getCompMobile=VueLayouts::where('wherePage','ProdByCat')->orderBy('sortMobile','asc')->get();
 
-        return view('Cpanel.layouts.ProdByCat',['Layout'=>$getComp]);
+        return view('Cpanel.layouts.ProdByCat',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]);
     }
 
 

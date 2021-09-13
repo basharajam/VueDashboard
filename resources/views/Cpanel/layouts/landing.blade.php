@@ -20,14 +20,17 @@
     <div class="container">
         <div class="row">
             <h4 class="text-center">Desktop Layout</h4>
-            <div class="col-sm-12">
+            <div class="col-sm-11">
                 <div class="row" id="sortableProdBox">
                     @foreach ($ProdInBox as $item)
-                        <div class="col-sm-3 ProdInBox" data-sort="{{ $item['sort'] }}" data-sortdesk="{{ $item['Display'] }}"  data-id="{{ $item['id'] }}" >
-                            {{$item['title']}}
-                            <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                            
+                      <div class="card col-sm-3 prodInBoxItem" data-sort="{{ $item['sort'] }}" data-id="{{ $item['id'] }}" >
+                        <div class="card-body d-flex align-items-center">
+                          <h5 class="card-title">{{$item['title']}}</h5>
+                          <button type="button" class="btn btn-primary UpdItem" data-id="{{$item['id']}}" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Update
+                          </button> 
                         </div>
+                      </div>
                     @endforeach
                 </div>
                 <div class="row" id='sortable'>
@@ -62,7 +65,7 @@
         </div>
         <div class="row">
           <h4 class="text-center">Mobile Layout</h4>
-          <div class="col-sm-12">
+          <div class="col-sm-11">
             <div class="row" id='sortableMobile'>
                 @foreach ($mobileLayout as $item)
                   <div class="card m-1" data-sort="{{ $item['sortMobile'] }}" data-id="{{ $item['id'] }}" >
@@ -106,9 +109,9 @@
         })
 
         //Prod In Box Dragable
-        const ProdInBoxsortable = new Draggable.Sortable(
-		    document.querySelector('#sortableProdBox'), {
-			draggable: 'div.ProdInBox',
+      const ProdInBoxsortable = new Draggable.Sortable(
+      document.querySelector('#sortableProdBox'), {
+			draggable: 'div.prodInBoxItem',
 		})
         ProdInBoxsortable.on('sortable:stop', () => {
             console.log('sortable:stop')
@@ -116,16 +119,12 @@
             var sortArr=[];
             var i=1
             setTimeout(() => {
-              $('#sortableProdBox div').each(function(){
-                
+              $('#sortableProdBox div.prodInBoxItem').each(function(){
                 var increase = i++
                 $(this).attr('data-sort',increase)
                 idArr.push($(this).data('id'))
                 sortArr.push($(this).attr('data-sort'))
-                
               })
-              console.log(sortArr)
-
 
               $.ajax({
                   method:"post",
@@ -138,14 +137,11 @@
                   },
                   success:function(resp){
 
-                    console.log(resp)
                     //Update Sort data id 
+                    toastr["success"]("Sort Successfully Updated")
                   },
               })
             }, 1000);
-     
-            // console.log(test)
-
         })
         //End Prod In Box Dragable 
 
@@ -169,8 +165,6 @@
                 sortArrLanding.push($(this).attr('data-sort'))
                 
               })
-              console.log(sortArrLanding)
-
 
               $.ajax({
                   method:"post",
@@ -183,8 +177,8 @@
                   },
                   success:function(resp){
 
-                    console.log(resp)
                     //Update Sort data id 
+                    toastr["success"]("Sort Successfully Updated")
                   },
               })
             }, 1000);
@@ -213,8 +207,6 @@
                 sortArrLanding.push($(this).attr('data-sort'))
                 
               })
-              console.log(sortArrLanding)
-
 
               $.ajax({
                   method:"post",
@@ -227,14 +219,12 @@
                   },
                   success:function(resp){
 
-                    console.log(resp)
+
                     //Update Sort data id 
+                    toastr["success"]("Sort Successfully Updated")
                   },
               })
             }, 1000);
-     
-            // console.log(test)
-
         })
 
     </script>

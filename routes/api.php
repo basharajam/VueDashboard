@@ -18,13 +18,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/Categories',['uses'=>'App\Http\Controllers\ApiController@getCategories']);
+
 Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@getProds']);
 
 Route::post('/getLayout',['uses'=>'App\Http\Controllers\CpanelController@getLayout','as'=>'getLayout']);
 
+Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@ProdByCat']);
+
+route::get('/ProdOne/{cat}/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@ProdOne']);
 
 Route::get('/test',['uses'=>'App\Http\Controllers\ApiController@test']);
 
 route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds'])->middleware('cors');
-
-route::get('/ProdOne/{cat}/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\ApiController@ProdOne']);
