@@ -132,7 +132,7 @@
                   data:{
                     idArr,
                     sortArr,
-
+                    type:'desktop',
                     _token:'{{ csrf_token() }}'
                   },
                   success:function(resp){
