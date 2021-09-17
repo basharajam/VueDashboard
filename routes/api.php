@@ -30,4 +30,4 @@ route::get('/ProdOne/{cat}/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\Api
 
 Route::get('/test',['uses'=>'App\Http\Controllers\ApiController@test']);
 
-route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds'])->middleware('cors');
+route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds']);
