@@ -32,6 +32,8 @@ Route::prefix('Cpanel')->group(function () {
 
     route::get('ProdByCat',['uses'=>'App\Http\Controllers\CpanelController@ProdByCatGet','as'=>'ProdByCat']);
 
+    route::get('AllCatPage',['uses'=>'App\Http\Controllers\CpanelController@AllCatGet','as'=>'AllCatLayoutGet']);
+
     route::post('updateSectionLanding',['uses'=>'App\Http\Controllers\CpanelController@updateSectionLanding','as'=>'updateSectionLanding']);
 
     route::post('updateSort',['uses'=>'App\Http\Controllers\CpanelController@updateSort','as'=>'updateSort']);

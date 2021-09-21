@@ -17,7 +17,7 @@ class ApiController extends Controller
 {
 
 
-    public function getCategories()
+    public function getCategories($cur,$ship)
     {
         //getCategories
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->pluck('term_id');
@@ -37,7 +37,23 @@ class ApiController extends Controller
 
         });
 
-        return response()->json($transCat, 200);
+
+        $response=array();
+
+        //Get Components Desktop
+        $getLayoutsLists=VueLayouts::where('wherePage','AllCat')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+        $DesktopResponse=$this->responseLayout($getLayoutsLists,$cur,$ship);
+        //Get Components Mobile
+        $getLayoutsListsMobile=VueLayouts::where('wherePage','AllCat')->where('mobileDisplay','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+        $mobileResponse=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+        
+        $response['desktop'] = $DesktopResponse;
+        $response['mobile'] = $mobileResponse;
+        $response['Categories'] = $transCat;
+
+        return response()->json($response, 200);
+
+        // return response()->json($transCat, 200);
     }
 
 

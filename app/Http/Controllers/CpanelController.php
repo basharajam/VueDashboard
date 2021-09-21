@@ -207,5 +207,13 @@ class CpanelController extends Controller
         return view('Cpanel.layouts.ProdByCat',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]);
     }
 
+    public function AllCatGet()
+    {
+        $getComp=VueLayouts::where('wherePage','AllCat')->orderBy('sort','asc')->get();
+        $getCompMobile=VueLayouts::where('wherePage','AllCat')->orderBy('sortMobile','asc')->get();
+
+        return view('Cpanel.layouts.AllCat',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]);
+    }
+
 
 }
