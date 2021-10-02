@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Post;
@@ -13,10 +14,10 @@ use App\Models\PostAll;
 use App\Models\VueLayouts;
 use App\Models\WpUser;
 use App\Models\otp;
+
 class ApiController extends Controller
 {
-
-
+    //
     public function getCategories($cur,$ship)
     {
         //getCategories
@@ -524,25 +525,13 @@ class ApiController extends Controller
     public function ProdOne($id,$cur,$ship)
     {
 
-
         if(!empty($id)){
 
-            // //Check Category 
-            //     //get Id Of Category 
-            //     $getCat=Term::where('name',$cat)->first();
-                
-            //     //Check Category
-            //     if(!empty($getCat)){
-            //         $CheckCat=TermTaxonomy::where('term_id',$getCat['term_id'])->where('taxonomy','product_cat')->first();
-            //     }
-            //     else{
-            //         $CheckCat=null;
-            //     }
             //Check Product
                 //Check Product By Product TYpe
                 $postTypes=[ 'product','product_variation'];
                 $CheckProd=PostAll::where('ID',$id)->whereIn('post_type',$postTypes)->first();
-                
+
             if(isset($CheckProd)){
                 
                 $item= $CheckProd;
