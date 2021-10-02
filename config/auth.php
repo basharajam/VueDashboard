@@ -42,8 +42,8 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'jwt',
+            'provider' => 'wpuser',
             'hash' => false,
         ],
     ],
@@ -71,10 +71,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'wpuser' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\WpUser::class,
+        ],
     ],
 
     /*

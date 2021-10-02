@@ -14,7 +14,7 @@ class PostAll extends Corcel
 
     protected $connection = 'wordpress';
 
-    protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
+    protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type','avg_rate','min_qty'];
    
     protected function getCbmAttribute(): ?string
     {
@@ -24,9 +24,18 @@ class PostAll extends Corcel
     {
         return $this->getMeta('al_carton_qty');
     }
-    protected function getProductVariationsAttribute(): ?string
+
+    protected function getAvgRateAttribute()
     {
-        return $this->getMeta('al_carton_qty');
+        return $this->getMeta('_wc_average_rating');
     }
+
+    protected function getMinQtyAttribute()
+    {
+        return $this->getMeta('_wc_min_qty_product');
+    }
+
+
+    
 
 }
