@@ -214,6 +214,5 @@ class CpanelController extends Controller
 
         return view('Cpanel.layouts.AllCat',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]);
     }
-
-
+    
 }

@@ -26,6 +26,8 @@ Route::prefix('Cpanel')->group(function () {
 
    Route::prefix('layouts')->group(function () {
     
+
+    //Layout
     route::get('landingPage',['uses'=>'App\Http\Controllers\CpanelController@LandingGet','as'=>'landingLayoutGet']);
 
     route::get('ProdOnePage',['uses'=>'App\Http\Controllers\CpanelController@ProdOneGet','as'=>'ProdOneLayoutGet']);
@@ -41,6 +43,16 @@ Route::prefix('Cpanel')->group(function () {
     route::post('SaveComp',['uses'=>'App\Http\Controllers\CpanelController@SaveComp','as'=>'SaveComp']);
 
     route::post('DelComp',['uses'=>'App\Http\Controllers\CpanelController@DelComp','as'=>'DelComp']);
+
+    
+    //Configs
+    route::get('Shipment',['uses'=>'App\Http\Controllers\Cpanel\configController@ShipmentConfig','as'=>'ShipmentConfig']);
+
+    route::get('Currency',['uses'=>'App\Http\Controllers\Cpanel\configController@CurrencyConfig','as'=>'CurrencyConfig']);
+    
+    route::get('main',['uses'=>'App\Http\Controllers\Cpanel\configController@MainConfig','as'=>'MainConfig']);
+
+    route::post('SaveConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@SaveConfig','as'=>'SaveConfig']);
 
    });
 });
