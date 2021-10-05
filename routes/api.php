@@ -28,6 +28,8 @@ Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiContro
 
 Route::post('/getLayout',['uses'=>'App\Http\Controllers\CpanelController@getLayout','as'=>'getLayout']);
 
+Route::post('/getConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@getConfig','as'=>'getConfig']);
+
 Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByCat']);
 
 route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdOne']);

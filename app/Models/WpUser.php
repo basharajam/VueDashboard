@@ -43,7 +43,11 @@ class WpUser extends Authenticatable implements JWTSubject
         "user_activation_key" ,
         "user_status" ,
         "display_name" ,
-        ];
+    ];
+
+    protected $hidden = [
+        'user_pass'
+    ];
 
         public function getAuthPassword()
         {

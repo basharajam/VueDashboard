@@ -30,7 +30,7 @@ class UsersController extends Controller
             'Pass2I'=>'required|min:8',
             'MailI'=>'required|email',
         ]);
-
+        
         if ($validate->fails()) {
             return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'item'=>null],400);
         }
@@ -193,10 +193,24 @@ class UsersController extends Controller
     public function LoginByMail(Request $request)
     {
         //validate Inputs 
-        return $request->all();
+        
+        //Check User
+        if(!$token = Auth::guard('api')->attempt(
+            array(
+            'user_email'=>$request->input('mail'),
+            'password'=>$request->input('pass')
+            ))){
+                return 'Baddd';
+            }
+            else{
+                
+              $response=array(
+                'user'=>Auth::guard('api')->user(),
+                'token'=>$token
+              );
 
-        //Check User 
-
+             return response()->json(['code'=>200,'message'=>'User Successfully Logged-In','status'=>true,'item'=>$response],200); 
+            }
         //Done
 
     }

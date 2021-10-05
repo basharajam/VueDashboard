@@ -53,7 +53,6 @@ class CpanelController extends Controller
             'link'=>$validate['link'],
             'Display'=>$validate['displayDesktop'],
             'mobileDisplay'=>$validate['displayMobile'],
-
         ];
 
         $getSection=Vuelayouts::where('compName',$validate['compName'])->where('id',$validate['compId'])->update($update);

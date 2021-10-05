@@ -18,10 +18,11 @@ class configController extends Controller
         return view('Cpanel.configs.shipment',['Configs'=>$getConfig]);
     }
 
-    public function CurrencyConfig ()
+    public function CurrencyConfig()
     {
         //get Currency Configs 
-        return view('Cpanel.configs.currency');
+        $getConfig=VueConfig::where('type','currency')->get();
+        return view('Cpanel.configs.currency',['Configs'=>$getConfig]);
     }
 
     public function MainConfig()
@@ -62,9 +63,48 @@ class configController extends Controller
         $saveConfig->save();
 
         //response
-
         return 'Done';
+    }
 
+    public function UpdConfig(Request $request)
+    {
+        //validate Inputs 
+        $validate=$request->validate([
+          'ConfigNameUI'=>'required',
+          'ConfigKeyUI'=>'required',
+          'ConfigValueUI'=>'required',
+          'ConfigIdUI'=>'required'
+        ]);
+
+        //Update Config
+        $update=[
+            'name'=>$validate['ConfigNameUI'],
+            'key'=>$validate['ConfigKeyUI'],
+            'value'=>$validate['ConfigValueUI'],
+            'subValue'=>$request->input('ConfigSubValueUI'),
+        ];
+
+        $getConfig=VueConfig::where('id',$validate['ConfigIdUI'])->update($update);
+        //$getConfig= VueConfig::where('name',$validate['ConfigIdUI'])->update($update);
+        return $getConfig;
+        if($getConfig >0){
+            return response()->json(['success'=>true,'item'=>$validate],200);
+        }
+        else{
+            return response()->json(['success'=>false,'item'=>null],403);
+        }
+    }
+
+    public function getConfig(Request $request)
+    {
+        //validat input
+        if(!empty($request->input('id'))){
+
+            $getConfig=VueConfig::where('id',$request->input('id'))->first();
+
+            return $getConfig;
+
+        }
     }
 
 

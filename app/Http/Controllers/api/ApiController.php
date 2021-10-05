@@ -14,6 +14,7 @@ use App\Models\PostAll;
 use App\Models\VueLayouts;
 use App\Models\WpUser;
 use App\Models\otp;
+use App\Models\VueConfig;
 
 class ApiController extends Controller
 {
@@ -62,83 +63,6 @@ class ApiController extends Controller
 
     public function SetShipCurr($cur,$ship,$cartQty,$Cbm,$type,$price,$dprice,$onSale)
     {
-        switch ($ship) {
-            case "SA":
-                $shipCost=2200;
-                break;
-            case "SY":
-                $shipCost=960; //AED
-                break;
-            case "OM":
-                $shipCost=985;
-                break;
-            case "YE":
-                $shipCost=985;
-                break;
-            case "LB":
-                $shipCost=1935; //OM
-                break;
-            case "IQ":
-                $shipCost=1550;
-                break;
-            case "AE":
-                $shipCost=960;
-                break;
-            case "PS":
-                $shipCost=1935; //Lbn
-                break;
-            default:
-                $shipCost=0;
-        }
-
-        
-
-        $shipPerc=0.2;
-        $finalShipCost=$shipCost*$shipPerc+$shipCost;
-        
-        $curArr=array(
-            'AED'=>array(
-                'exhange'=>0.57,
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'د.إ'
-            ),
-            'SAR'=>array(
-                'exhange'=>0.58,
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'ر.س'
-            ),
-            'OMR'=>array(
-                'exhange'=>0.06,
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'ر.ع'
-            ),
-            'IQD'=>array(
-                'exhange'=>0.155, //USD
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'$'
-            ),
-            'LBP'=>array(
-                'exhange'=>0.155, //USD
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'$'
-            ),
-            'SYP'=>array(
-                'exhange'=>0.57, //AED
-                'increasedShipCost'=>$finalShipCost, //AED
-                'symbol'=>'د.إ' //AED
-            ),
-            'CNY'=>array(
-                'exhange'=>1,
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'¥'
-            ),
-            'random'=>array(
-                'exhange'=>0.155, //USD
-                'increasedShipCost'=>$finalShipCost,
-                'symbol'=>'$'
-            )
-        );
-        $CurValues=$curArr;
 
         if($type === 'simple'){
             $regular=$price;
@@ -165,33 +89,40 @@ class ApiController extends Controller
 
         }
 
-        if($type ==='simple' && array_key_exists($cur,$curArr)){
+        //get ShipPerc
+        $ShipPrecConfig=VueConfig::where('key','ShipPerc')->where('type','main')->first();
 
-            $CartonShipPrice=$CurValues[$cur]['increasedShipCost']*$Cbm;
+        //get Currency
+        $getCurr=VueConfig::where('key',$cur)->where('type','Currency')->first();
+        
+        //get Shipment
+        $getShipConfig=VueConfig::where('key',$ship)->where('type','shipment')->first();
+    
+
+        if(empty($getCurr)){
+            $getCurr=VueConfig::where('key','default')->where('type','Currency')->first();
+        }
+
+        if(empty($getShipConfig)){
+            $getShipConfig=VueConfig::where('key','default')->where('type','shipment')->first();
+        }
+
+        //$finalShipCost=$shipCost*$shipPerc+$shipCost;
+        
+        $incresedShipCost=$getShipConfig['value']*$ShipPrecConfig['value']+$getShipConfig['value'];
+
+        if($type ==='simple'){
+
+            $CartonShipPrice=$incresedShipCost*$Cbm;
             $ProdShipPrice=$CartonShipPrice / $cartonQty;
             $fullPrice=$ProdShipPrice+(float)$regular;
             $saleFullPrice=$ProdShipPrice+(float)$sale;
-            $regPriceHtml=$fullPrice*$CurValues[$cur]['exhange'] ;
-            $salePriceHtml=$saleFullPrice*$CurValues[$cur]['exhange'];
-
+            $regPriceHtml=$fullPrice*$getCurr['value'];
+            $salePriceHtml=$saleFullPrice*$getCurr['value'];
         }
-
-        elseif($type ==='simple' && !array_key_exists($cur,$curArr)){
-
-          
-
-            $CartonShipPrice=$CurValues['random']['increasedShipCost']*$Cbm;
-            $ProdShipPrice=$CartonShipPrice / $cartonQty;
-            $fullPrice=$ProdShipPrice+(float)$regular;
-            $saleFullPrice=$ProdShipPrice+(float)$sale;
-            $regPriceHtml=$fullPrice*$CurValues['random']['exhange'] ;
-            $salePriceHtml=$saleFullPrice*$CurValues['random']['exhange'];
-
-
-        }
-        elseif($type === 'variable' && array_key_exists($cur,$curArr)){
-            $minCartonShipPrice=(float)$CurValues[$cur]['increasedShipCost']*$minCbm;
-            $maxCartonShipPrice=(float)$CurValues[$cur]['increasedShipCost']*$maxCbm;
+        elseif($type === 'variable'){
+            $minCartonShipPrice=(float)$incresedShipCost*$minCbm;
+            $maxCartonShipPrice=(float)$incresedShipCost*$maxCbm;
             $minProdShipPrice=(float)$minCartonShipPrice/$minQty;
             $maxProdShipPrice=(float)$maxCartonShipPrice/$maxQty;
             //reg Price
@@ -207,42 +138,14 @@ class ApiController extends Controller
                 $maxSaleFullPrice=null;
             }
             //xhange price
-            $minRegFullPriceHtml=$minRegFullPrice*$CurValues[$cur]['exhange'];
-            $maxRegFullPriceHtml=$maxRegFullPrice*$CurValues[$cur]['exhange'];
-            $minSaleFullPriceHtml=$minSaleFullPrice*$CurValues[$cur]['exhange'];
-            $maxSaleFullPriceHtml=$maxSaleFullPrice*$CurValues[$cur]['exhange'];
-        }
-        elseif($type === 'variable' && !array_key_exists($cur,$curArr)){
-            $minCartonShipPrice=(float)$CurValues['random']['increasedShipCost']*$minCbm;
-            $maxCartonShipPrice=(float)$CurValues['random']['increasedShipCost']*$maxCbm;
-            $minProdShipPrice=(float)$minCartonShipPrice/$minQty;
-            $maxProdShipPrice=(float)$maxCartonShipPrice/$maxQty;
-            //reg Price
-            $minRegFullPrice=$minProdShipPrice+(float)$minRegPrice;
-            $maxRegFullPrice=$maxProdShipPrice+(float)$maxRegPrice;
-            //sale price
-            if($onSale){
-                $minSaleFullPrice=$minProdShipPrice+(float)$minSalePrice;
-                $maxSaleFullPrice=$maxProdShipPrice+(float)$maxSalePrice;
-            }
-            else{
-                $minSaleFullPrice=null;
-                $maxSaleFullPrice=null;
-            }
-            //xhange price
-            $minRegFullPriceHtml=$minRegFullPrice*$CurValues['random']['exhange'];
-            $maxRegFullPriceHtml=$maxRegFullPrice*$CurValues['random']['exhange'];
-            $minSaleFullPriceHtml=$minSaleFullPrice*$CurValues['random']['exhange'];
-            $maxSaleFullPriceHtml=$maxSaleFullPrice*$CurValues['random']['exhange'];
+            $minRegFullPriceHtml=$minRegFullPrice*$getCurr['value'];
+            $maxRegFullPriceHtml=$maxRegFullPrice*$getCurr['value'];
+            $minSaleFullPriceHtml=$minSaleFullPrice*$getCurr['value'];
+            $maxSaleFullPriceHtml=$maxSaleFullPrice*$getCurr['value'];
         }
 
         //Cur Symbol
-        if(array_key_exists($cur,$curArr)){
-            $curHtml=$curArr[$cur]['symbol'];
-        }
-        else{
-            $curHtml=$curArr['random']['symbol'];
-        }
+        $curHtml=$getCurr['subValue'];
 
         //Public Html Generate 
         if($type === 'simple'){
@@ -253,7 +156,6 @@ class ApiController extends Controller
             else{
                 $price_html='<span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span>  ' .number_format((float)$regPriceHtml,2)  . '  </span>';
             }
-
         }
         elseif($type === 'variable'){
 
@@ -268,8 +170,6 @@ class ApiController extends Controller
                 else{
                     $price_html='<span><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">  '.$curHtml.'  </span> ' . number_format((float)$minRegFullPriceHtml,2) . ' </span> <span style="font-weight: bold;color:black;font-size: 16px;">-</span> <span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">'.$curHtml.'</span>'.number_format((float)$maxRegFullPriceHtml,2).'</span></span>';
                 }
-
-                
             }
         }
 
@@ -280,7 +180,6 @@ class ApiController extends Controller
                 'salePriceHtml'=>$salePriceHtml,
                 'price_html'=>$price_html
             ];
-
         }
         elseif($type === 'variable'){
 
@@ -388,7 +287,7 @@ class ApiController extends Controller
                     'price'=>$priceX['regPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
-                    'meta'=>$item->meta
+                    // 'meta'=>$item->meta
                 ];
             }
             elseif($item['type'] === 'variable'){
@@ -407,7 +306,7 @@ class ApiController extends Controller
                     'max_sale_price'=>$priceX['maxSaleFullPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
-                    'meta'=>$item->meta
+                    // 'meta'=>$item->meta
                 ];
             }
 

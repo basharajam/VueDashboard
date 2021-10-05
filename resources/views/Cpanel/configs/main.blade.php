@@ -15,7 +15,7 @@
                     <div class="card">
                         <div class="card-body d-flex justify-content-between">
                             <p>{{ $Config['name'] }}</p>
-                            <button class="btn btn-info">E</button>
+                            <button class="btn btn-info" id="UpdConfig"  data-bs-toggle="modal" data-bs-target="#UpdConfigModal" data-id="{{ $Config['id'] }}">E</button>
                         </div>
                     </div>
                 </div>

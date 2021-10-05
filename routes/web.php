@@ -54,5 +54,8 @@ Route::prefix('Cpanel')->group(function () {
 
     route::post('SaveConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@SaveConfig','as'=>'SaveConfig']);
 
+    route::post('UpdConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@UpdConfig','as'=>'UpdConfig']);
+
+
    });
 });
