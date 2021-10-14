@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\Post;
 use App\Models\PostV;
 use App\Models\TermTaxonomy;
@@ -18,6 +19,29 @@ use App\Models\VueConfig;
 
 class ApiController extends Controller
 {
+
+    public function getConfig()
+    {
+        $response=array();
+
+        //get Social Links
+        $facebook=Socialite::with('facebook')->stateless()->redirect()->getTargetUrl();
+        $google=Socialite::with('google')->stateless()->redirect()->getTargetUrl();
+        
+        //get Currency Configs
+        $CurrConfig=VueConfig::where('type','currency')->get();
+
+        //get Shipment Configs
+        $ShipConfig=VueConfig::where('type','shipment')->get();
+
+        $response['facebook']=$facebook;
+        $response['google']=$google;
+        $response['Shipment']=$ShipConfig;
+        $response['Currency']=$CurrConfig;
+
+        return response()->json(['code'=>200,'message'=>'Login Links Successfully Generated','status'=>true,'item'=>$response],200); 
+    }
+
     //
     public function getCategories($cur,$ship)
     {
@@ -229,10 +253,13 @@ class ApiController extends Controller
         //Transform Product Object
         $trans=$ProdBy->map(function($item) use ($tax,$cur,$ship,$limit,$title,$link,$compType,$compName,$Display,$mobileDisplay) {
             
-            //return $item;
-            
-            //     ;
-            // $priceX=SetShipCurr($cur,$ship,$type,$price,$dprice)
+            // return $item;
+            // $getCat=TermTaxonomy::whereIn('term_taxonomy_id',
+            // TermRelation::where('object_id',$item->id)
+            //             ->pluck('term_taxonomy_id'))
+            // ->whereIn('taxonomy',['product_cat'])
+            // ->get();
+
             if($item['type'] === 'variable'){
 
                 $VarProd= PostV::where('post_parent',$item['ID'])->get();
@@ -257,6 +284,9 @@ class ApiController extends Controller
             //get Avarage Rate 
             $arr=$item->meta;
             $avgRate =array_search('_wc_average_rating', array_column(json_decode($arr,true), 'meta_key'));
+
+            //get Category
+
 
             //img 
             if(!empty($item->gallery[0]['guid'])){
@@ -287,6 +317,7 @@ class ApiController extends Controller
                     'price'=>$priceX['regPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
+                    'Category'=>$item->Categories[0]->term
                     // 'meta'=>$item->meta
                 ];
             }
@@ -306,6 +337,7 @@ class ApiController extends Controller
                     'max_sale_price'=>$priceX['maxSaleFullPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
+                    'Category'=>$item->Categories[0]->term
                     // 'meta'=>$item->meta
                 ];
             }
@@ -356,7 +388,6 @@ class ApiController extends Controller
      
         $response=array();
 
-        
         //Get Components Desktop
         $getLayoutsLists=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
         $DesktopResponse=$this->responseLayout($getLayoutsLists,$cur,$ship);
@@ -371,9 +402,6 @@ class ApiController extends Controller
 
         return response()->json($response, 200);
     }
-
-
-
 
     public function test()
     {
@@ -421,15 +449,15 @@ class ApiController extends Controller
     }
 
     
-    public function ProdOne($id,$cur,$ship)
+    public function ProdOne($Name,$cur,$ship)
     {
 
-        if(!empty($id)){
+        if(!empty($Name)){
 
             //Check Product
                 //Check Product By Product TYpe
                 $postTypes=[ 'product','product_variation'];
-                $CheckProd=PostAll::where('ID',$id)->whereIn('post_type',$postTypes)->first();
+                $CheckProd=PostAll::where('post_title',$Name)->whereIn('post_type',$postTypes)->first();
 
             if(isset($CheckProd)){
                 

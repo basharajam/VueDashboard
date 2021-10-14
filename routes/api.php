@@ -22,6 +22,8 @@ Route::get('/',function(){
     return response()->json(['code'=>403,'message'=>'Not Authorized','status'=>false,'item'=>null],403);
 })->name('ApiN');
 
+Route::get('/getConfig',['uses'=>'App\Http\Controllers\api\ApiController@getConfig']);
+
 Route::get('/Categories/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getCategories']);
 
 Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getProds']);
@@ -44,9 +46,9 @@ Route::get('/redirectF',['uses'=>'App\Http\Controllers\api\UsersController@redir
 
 Route::get('/redirectG',['uses'=>'App\Http\Controllers\api\UsersController@redirectG']);
 
-Route::get('/RegisterByFaceBook',['uses'=>'App\Http\Controllers\api\UsersController@RegisterByFaceBook']);
+Route::get('/ValidateByFaceBook',['uses'=>'App\Http\Controllers\api\UsersController@ValidateByFaceBook']);
 
-Route::get('/RegisterByGoogle',['uses'=>'App\Http\Controllers\api\UsersController@RegisterByGoogle']);
+Route::get('/ValidateByGoogle',['uses'=>'App\Http\Controllers\api\UsersController@ValidateByGoogle']);
 
 Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@LoginByMail']);
 

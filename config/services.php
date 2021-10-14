@@ -33,12 +33,12 @@ return [
     'google' => [
         'client_id' => '42227846360-ejslm7jf2orv42isq9q1m5e027t2qfbc.apps.googleusercontent.com',
         'client_secret' =>'lFOdrbzGbGFTu_BLCg0NN4p7',
-        'redirect' => 'http://localhost:8000/api/RegisterByGoogle',
+        'redirect' => 'http://localhost:8000/api/ValidateByGoogle',
     ],
 
     'facebook' => [
         'client_id' => '1342323862830933',
         'client_secret' => '778341ee4e3107a033f9f07a0c13ee18',
-        'redirect' => 'http://localhost:8000/api/RegisterByFaceBook',
+        'redirect' => 'http://localhost:8000/api/ValidateByFaceBook',
     ],
 ];

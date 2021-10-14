@@ -15,22 +15,19 @@ use App\Models\WpUser;
 class UsersController extends Controller
 {
     //
-
-
     public function RegisterByMail(Request $request)
     {
-
 
         //validate Inputs 
         $validate = Validator::make(request()->all(), [
             'FirstNameI'=>'required',
-            'LastNameI'=>'required',
+            'lastNameI'=>'required',
             'UserNameI'=>"required|min:8",
             'PassI'=>'required|min:8',
             'Pass2I'=>'required|min:8',
             'MailI'=>'required|email',
         ]);
-        
+
         if ($validate->fails()) {
             return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'item'=>null],400);
         }
@@ -92,29 +89,29 @@ class UsersController extends Controller
     {
         return Socialite::with('google')->stateless()->redirect()->getTargetUrl();
     }
-
-    public function RegisterByFaceBook()
+    public function ValidateByFaceBook()
     {
         //get User Data 
         $fb_user = Socialite::with('facebook')->stateless()->user();
 
-        //validate Inputs 
-        
-
         //Check Mail Is Unique 
         $CheckMail=WpUser::where('user_email',$fb_user->getEmail())->get();
-        if(count($CheckMail) > 0 ){
-            return response()->json(['code'=>400,'message'=>'Mail Already in Use','status'=>false,'item'=>null],400);
-        } 
 
         //Check Username Is Unique 
         $CheckUserName=WpUser::where('user_login',strstr($fb_user->getEmail(), '@', true))->get();
-        if(count($CheckUserName) > 0 ){
-            return response()->json(['code'=>400,'message'=>'Username Already in Use','status'=>false,'item'=>null],400);
-        } 
+
+        //If User Exists Auth With It
+        if(count($CheckMail) > 0 && count($CheckUserName) > 0){
+            $token=Auth::guard('api')->tokenById($CheckMail[0]['ID']);
+            $response=array(
+                'user'=>$CheckMail[0],
+                'token'=>$token
+            );
+            return view('others.socialiteCallback',['user'=>$CheckMail[0],'token'=>$token]);
+        }
 
         // password
-        $bcryptpass=0;
+        $bcryptpass=bcrypt(md5(uniqid(rand(), true)));
 
         //Save User 
         $wp_user = WpUser::create([
@@ -135,36 +132,35 @@ class UsersController extends Controller
             'user'=>$wp_user,
             'token'=>$token
         );
+        return view('others.socialiteCallback',['user'=>$wp_user,'token'=>$token]);
+        //return view('socialiteCallback',$response);
 
-        return response()->json(['code'=>201,'message'=>'User Successfully Created','status'=>true,'item'=>$response],201); 
+        //return response()->json(['code'=>201,'message'=>'User Successfully Created','status'=>true,'item'=>$response],201); 
     }
 
-    public function RegisterByGoogle()
+    public function ValidateByGoogle()
     {
         //get User Data 
         $fb_user = Socialite::with('google')->stateless()->user();
-        // $fb_user->getNickname();
-        // $fb_user->getName();
-        // $fb_user->getEmail();
-
-
-        //validate Inputs 
-        
 
         //Check Mail Is Unique 
         $CheckMail=WpUser::where('user_email',$fb_user->getEmail())->get();
-        if(count($CheckMail) > 0 ){
-            return response()->json(['code'=>400,'message'=>'Mail Already in Use','status'=>false,'item'=>null],400);
-        } 
 
         //Check Username Is Unique 
         $CheckUserName=WpUser::where('user_login',strstr($fb_user->getEmail(), '@', true))->get();
-        if(count($CheckUserName) > 0 ){
-            return response()->json(['code'=>400,'message'=>'Username Already in Use','status'=>false,'item'=>null],400);
-        } 
+
+        //If User Exists Auth With It
+        if(count($CheckMail) > 0 && count($CheckUserName) > 0){
+            $token=Auth::guard('api')->tokenById($CheckMail[0]['ID']);
+            $response=array(
+                'user'=>$CheckMail[0],
+                'token'=>$token
+            );
+            return view('others.socialiteCallback',['user'=>$CheckMail[0],'token'=>$token]);
+        }
 
         // password
-        $bcryptpass=0;
+        $bcryptpass=bcrypt(md5(uniqid(rand(), true)));
 
         //Save User 
         $wp_user = WpUser::create([
@@ -185,6 +181,8 @@ class UsersController extends Controller
             'user'=>$wp_user,
             'token'=>$token
         );
+
+        return view('others.socialiteCallback',['user'=>$wp_user,'token'=>$token]);
 
         return response()->json(['code'=>201,'message'=>'User Successfully Created','status'=>true,'item'=>$response],201); 
     }
@@ -197,8 +195,8 @@ class UsersController extends Controller
         //Check User
         if(!$token = Auth::guard('api')->attempt(
             array(
-            'user_email'=>$request->input('mail'),
-            'password'=>$request->input('pass')
+            'user_email'=>$request->input('userMail'),
+            'password'=>$request->input('password')
             ))){
                 return 'Baddd';
             }
