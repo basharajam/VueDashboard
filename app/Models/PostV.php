@@ -2,11 +2,12 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PostMeta;
-use App\Models\TermRelation;
 use Illuminate\Database\Eloquent\Builder;
 use PhpParser\Node\Expr\FuncCall;
 
+use App\Models\PostMeta;
+use App\Models\TermRelation;
+use App\Models\Translation\Translation;
 
 
 use Corcel\Model\Attachment;
@@ -19,6 +20,18 @@ class PostV extends Corcel
 
 
     protected $appends = ['cbm','cartqty','type'];
+
+    public function scopeTranslate($query,$lang)
+    {
+        $element = Translation::where('trid', $this->ID)->where('language_code',$lang)->get();
+        if(count($element) > 0){
+            return $this->where('ID',$element[0]['element_id'])->first();
+        }
+        else{
+            return $this;
+        }
+    }
+
 
 
     protected function getCbmAttribute(): ?string

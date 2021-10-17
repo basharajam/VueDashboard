@@ -405,7 +405,9 @@ class ApiController extends Controller
 
     public function test()
     {
-       // $getProds=Post::newest()->->limit(1)->get();
+
+        //return  response()->json(Post::find(13107)->translate('en'), 200);
+       // $getPrds=Post::newest()->->limit(1)->get();
 
         $offers=Post::where('on_sale',true)->limit(1)->get();
         //$getProds->categories;

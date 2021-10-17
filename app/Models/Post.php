@@ -2,10 +2,11 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PostMeta;
-use App\Models\TermRelation;
 use Illuminate\Database\Eloquent\Builder;
 use PhpParser\Node\Expr\FuncCall;
+use App\Models\PostMeta;
+use App\Models\TermRelation;
+use App\Models\Translation\Translation;
 
 
 
@@ -14,12 +15,25 @@ use Corcel\WooCommerce\Model\Product as Corcel;
 class Post extends Corcel
 {
 
+    // public function scopeTranslate($query,$lang)
+    // {
+    //     $element = Translation::where('trid', $this->ID)->where('language_code',$lang)->get();
+    //     if(count($element) > 0){
+    //         return $this->where('ID',$element[0]['element_id'])->first();
+    //     }
+    //     else{
+    //         return $this;
+    //     }
+    // }
+
     protected $connection = 'wordpress';
 
     protected $postType='product';
 
 
+    //protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
     protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
+    
 
 
     protected function getCbmAttribute(): ?string

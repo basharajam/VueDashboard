@@ -14,6 +14,7 @@ class PostAll extends Corcel
 
     protected $connection = 'wordpress';
 
+    //protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type','avg_rate','min_qty'];
     protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type','avg_rate','min_qty'];
    
     protected function getCbmAttribute(): ?string
