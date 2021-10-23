@@ -31,7 +31,6 @@ class CpanelController extends Controller
 
     public function updateSectionLanding(Request $request)
     {
-
         # code...
         $validate=$request->validate([
             'title'=>'required',
@@ -44,19 +43,18 @@ class CpanelController extends Controller
             'compId'=>'required'
         ]);
 
-        
-
         $update=[
             'title'=>$validate['title'],
             'value'=>$validate['value'],
+            'compName'=>$validate['compName'],
             'itemNum'=>$validate['ItemNum'],
             'link'=>$validate['link'],
             'Display'=>$validate['displayDesktop'],
             'mobileDisplay'=>$validate['displayMobile'],
         ];
 
-        $getSection=Vuelayouts::where('compName',$validate['compName'])->where('id',$validate['compId'])->update($update);
-
+        $getSection=Vuelayouts::where('id',$validate['compId'])->update($update);
+        //$getSection=Vuelayouts::where('id',$validate['compId'])->get();
         if($getSection >0){
             return response()->json(['success'=>true,'item'=>$validate], 200);
            
@@ -122,10 +120,12 @@ class CpanelController extends Controller
 
     public function SaveComp(Request $request)
     {
+
+       
         //valiadte Inputs
         $validate=$request->validate([
             'CompTypeNI'=>'required',
-            'CompNameNI'=>'required',
+            'TransKeyNI'=>'required',
             'SectionTitleNI'=>'required|min:3',
             'SectionTypeNI'=>'required',
             'SectionValNI'=>'required',
@@ -147,7 +147,7 @@ class CpanelController extends Controller
             'value'=>$validate['SectionValNI'],
             'type'=>$validate['SectionTypeNI'],
             'wherePage'=>$validate['compwhereNI'],
-            'compName'=>$validate['CompNameNI'],
+            'compName'=>$validate['TransKeyNI'],
             'compType'=>$validate['CompTypeNI'],
             'itemNum'=>$validate['ItemNumNI'],
             'link'=>$validate['linkNI'],
@@ -212,6 +212,15 @@ class CpanelController extends Controller
         $getCompMobile=VueLayouts::where('wherePage','AllCat')->orderBy('sortMobile','asc')->get();
 
         return view('Cpanel.layouts.AllCat',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]);
+    }
+
+    public function ProdByTagGet()
+    {
+        // 
+        $getComp=VueLayouts::where('wherePage','ProdByTag')->orderBy('sort','asc')->get();
+        $getCompMobile=VueLayouts::where('wherePage','ProdByTag')->orderBy('sortMobile','asc')->get();
+
+        return view('Cpanel.layouts.ProdByTag',['Layout'=>$getComp,'LayoutMobile'=>$getCompMobile]); 
     }
     
 }

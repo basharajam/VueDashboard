@@ -34,6 +34,8 @@ Route::post('/getConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@
 
 Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByCat']);
 
+Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByTag']);
+
 route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdOne']);
 
 Route::get('/test',['uses'=>'App\Http\Controllers\api\ApiController@test']);
@@ -51,6 +53,10 @@ Route::get('/ValidateByFaceBook',['uses'=>'App\Http\Controllers\api\UsersControl
 Route::get('/ValidateByGoogle',['uses'=>'App\Http\Controllers\api\UsersController@ValidateByGoogle']);
 
 Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@LoginByMail']);
+
+Route::post('/SaveOrder',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrder']);
+
+Route::get('/GetOrder',['uses'=>'App\Http\Controllers\api\ApiController@GetOrder']);
 
 Route::get('/protected',function(){
     return 'Done';

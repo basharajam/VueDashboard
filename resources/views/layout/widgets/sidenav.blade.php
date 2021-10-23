@@ -19,6 +19,7 @@
                         <a class="nav-link" href="{{ route('ProdOneLayoutGet') }}">Product One Page </a>
                         <a class="nav-link" href="{{ route('AllCatLayoutGet') }}">All Categories Page</a>
                         <a class="nav-link" href="{{ route('ProdByCat') }}">Products By Category Page </a>
+                        <a class="nav-link" href="{{ route('ProdByTag') }}">Product By Tag</a>
                         {{-- <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a> --}}
                     </nav>
                 </div>

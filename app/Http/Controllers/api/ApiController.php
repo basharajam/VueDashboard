@@ -16,6 +16,11 @@ use App\Models\VueLayouts;
 use App\Models\WpUser;
 use App\Models\otp;
 use App\Models\VueConfig;
+use App\Models\Order;
+
+use App\Facades;
+
+use Auth;
 
 class ApiController extends Controller
 {
@@ -88,40 +93,40 @@ class ApiController extends Controller
     public function SetShipCurr($cur,$ship,$cartQty,$Cbm,$type,$price,$dprice,$onSale)
     {
 
+        $cartonQty=$cartQty;
+        
         if($type === 'simple'){
             $regular=$price;
             $sale=$dprice;
             $price=$price;
-            $cartonQty=$cartQty;
             $Cbm=$Cbm;
         }
         elseif($type === 'variable'){
 
-             $CbmArr=$Cbm;
-             $QtyArr=$cartQty;
-             $regularPArr=$price;
-             $salePArr=$dprice;
-             
-             $minQty=min($QtyArr);
-             $maxQty=max($QtyArr);
-             $minCbm=min($CbmArr);
-             $maxCbm=max($CbmArr);
-             $minRegPrice=min($regularPArr);
-             $maxRegPrice=max($regularPArr);
-             $minSalePrice=min($salePArr);
-             $maxSalePrice=max($salePArr);
-
+            $CbmArr=$Cbm;
+            $QtyArr=$cartQty;
+            $regularPArr=$price;
+            $salePArr=$dprice;
+            
+            $minQty=min($QtyArr);
+            $maxQty=max($QtyArr);
+            $minCbm=min($CbmArr);
+            $maxCbm=max($CbmArr);
+            $minRegPrice=min($regularPArr);
+            $maxRegPrice=max($regularPArr);
+            $minSalePrice=min($salePArr);
+            $maxSalePrice=max($salePArr);
         }
 
         //get ShipPerc
         $ShipPrecConfig=VueConfig::where('key','ShipPerc')->where('type','main')->first();
-
+        
         //get Currency
         $getCurr=VueConfig::where('key',$cur)->where('type','Currency')->first();
         
         //get Shipment
         $getShipConfig=VueConfig::where('key',$ship)->where('type','shipment')->first();
-    
+        
 
         if(empty($getCurr)){
             $getCurr=VueConfig::where('key','default')->where('type','Currency')->first();
@@ -131,14 +136,24 @@ class ApiController extends Controller
             $getShipConfig=VueConfig::where('key','default')->where('type','shipment')->first();
         }
 
-        //$finalShipCost=$shipCost*$shipPerc+$shipCost;
         
-        $incresedShipCost=$getShipConfig['value']*$ShipPrecConfig['value']+$getShipConfig['value'];
+
+        //$finalShipCost=$shipCost*$shipPerc+$shipCost;
+        if($getShipConfig['key'] === 'default'){
+            $incresedShipCost=$ShipPrecConfig['value'];
+        }else{
+            $incresedShipCost=$getShipConfig['value']*$ShipPrecConfig['value']+$getShipConfig['value'];
+        }
+
+        //$incresedShipCost=$getShipConfig['value']*$ShipPrecConfig['value']+$getShipConfig['value'];
+        
+
 
         if($type ==='simple'){
 
-            $CartonShipPrice=$incresedShipCost*$Cbm;
-            $ProdShipPrice=$CartonShipPrice / $cartonQty;
+            $CartonShipPrice=(float)$incresedShipCost*(float)$Cbm;
+            
+            (float)$ProdShipPrice=(float)$CartonShipPrice / (float)$cartonQty;
             $fullPrice=$ProdShipPrice+(float)$regular;
             $saleFullPrice=$ProdShipPrice+(float)$sale;
             $regPriceHtml=$fullPrice*$getCurr['value'];
@@ -250,6 +265,7 @@ class ApiController extends Controller
             }
         }
  
+        
         //Transform Product Object
         $trans=$ProdBy->map(function($item) use ($tax,$cur,$ship,$limit,$title,$link,$compType,$compName,$Display,$mobileDisplay) {
             
@@ -287,11 +303,11 @@ class ApiController extends Controller
 
             //get Category
 
-
+            
             //img 
-            if(!empty($item->gallery[0]['guid'])){
+            if(!empty($item->gall[0]['guid'])){
 
-                $imgMetaArr = $item->gallery[0]['meta'];
+                $imgMetaArr = $item->gall[0]['meta'];
                 $imgMetaIndex=array_search('_wp_attached_file', array_column(json_decode($imgMetaArr,true), 'meta_key'));
                 $imgMeta=$imgMetaArr[$imgMetaIndex];
                 $imgurl='http://alyaman.com/wp-content/uploads/'.$imgMeta['meta_value'];
@@ -300,7 +316,6 @@ class ApiController extends Controller
             else{
                 $imgArr=null;
             }
-            
 
             if($item['type'] === 'simple'){
 
@@ -406,7 +421,7 @@ class ApiController extends Controller
     public function test()
     {
 
-        //return  response()->json(Post::find(13107)->translate('en'), 200);
+        return  response()->json(Post::find(13107)->translate('en'), 200);
        // $getPrds=Post::newest()->->limit(1)->get();
 
         $offers=Post::where('on_sale',true)->limit(1)->get();
@@ -502,7 +517,7 @@ class ApiController extends Controller
                         'sale_price'=>$priceX['salePriceHtml'],
                         'price'=>$priceX['regPriceHtml'],
                         'price_html'=>$priceX['price_html'],
-                        'images'=>$item['gallery'],
+                        'images'=>$item['gall'],
                         'meta'=>$item->meta
                     ];
                 }
@@ -521,7 +536,7 @@ class ApiController extends Controller
                         'min_sale_price'=>$priceX['minSaleFullPriceHtml'],
                         'max_sale_price'=>$priceX['maxSaleFullPriceHtml'],
                         'price_html'=>$priceX['price_html'],
-                        'images'=>$item['gallery'],
+                        'images'=>$item['gall'],
                         'meta'=>$item->meta
                     ];
                 }
@@ -568,6 +583,138 @@ class ApiController extends Controller
 
         return response()->json($response, 200);
 
+    }
+
+
+
+    public function ProdByTag($tag,$cur,$ship)
+    {
+
+        //return $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
+        
+        if(!empty($tag)){
+            
+            $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
+            $getPosts=$this->getProdBy($getTag['value'],12,$cur,$ship,'tag','','','ProdList','ProdByCatList','list','list');
+        }
+        else{
+            $getPosts=null;
+        }
+
+        $getLayoutsLists=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+        $res=$this->responseLayout($getLayoutsLists,$cur,$ship);
+        $getLayoutsListsMobile=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+        $res2=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+
+
+        $response['tag']=$getPosts;
+        $response['desktop']=$res;
+        $response['mobile']=$res2;
+
+
+        return response()->json($response, 200);
+
+
+    }
+
+
+
+    public function SaveOrder(Request $request)
+    {
+        //Validate Inputs 
+
+        /////////////
+        //OrderType
+        //
+        //   'cancelled',
+        //   'completed',
+        //   'failed',
+        //   'on-hold',
+        //   'pending',
+        //   'processing',
+        //   'refunded',
+        //
+        //////////////
+
+        //get User
+        //$user=Auth::guard('api')->user();
+        
+        $userId=152;
+        //Save Order 
+        $SaveOrder=new Order;
+        $SaveOrder->post_status = 'pending';
+        $SaveOrder->post_type = "shop_order";
+        $SaveOrder->post_content=' ';
+        $SaveOrder->post_title='Order test 123';
+        $SaveOrder->post_excerpt=' ';
+        $SaveOrder->to_ping=' ';
+        $SaveOrder->pinged=' ';
+        $SaveOrder->post_content_filtered='';
+        $SaveOrder->save();
+
+        $metaArr=[
+            ['key'=>'_billing_first_name' ,'value'=>'test'],
+            ['key'=>'_billing_last_name' ,'value'=>'test12'],
+            ['key'=>'_billing_address_1' ,'value'=>'xxxxxxxxx'],
+            ['key'=>'_billing_city' ,'value'=>'xzxzxx'],
+            ['key'=>'_billing_country' ,'value'=>'dsadasd'],
+            ['key'=>'_billing_email' ,'value'=>'xasdasd@dd.dd'],
+            ['key'=>'_billing_phone' ,'value'=>'asdsadasd'],
+            ['key'=>'_shipping_first_name' ,'value'=>'xxxxxxxxxx'],
+            ['key'=>'_shipping_last_name' ,'value'=>'xxxxxx'],
+            ['key'=>'_shipping_address_1' ,'value'=>'xxxxxxx'],
+            ['key'=>'_shipping_city' ,'value'=>'xxxxxxx'],
+            ['key'=>'_shipping_country' ,'value'=>'xxxxxxx'],
+            ['key'=>'_order_currency','value'=>'xxxxxxx'],
+            ['key'=>'_cart_discount','value'=>'xxxxxxx'],
+            ['key'=>'_cart_discount_tax','value'=>'xxxxxxx'],
+            ['key'=>'_order_shipping','value'=>'xxxxxxx'],
+            ['key'=>'_order_shipping_tax','value'=>'xxxxxxx'],
+            ['key'=>'_order_tax','value'=>'xxxxxxx'],
+            ['key'=>'_order_total','value'=>'xxxxxxx'],
+            ['key'=>'_order_version','value'=>'xxxxxxx'],
+            ['key'=>'_billing_address_index','value'=>'xxxxxxx'],
+            ['key'=>'_shipping_address_index','value'=>'xxxxxxx'],
+            ['key'=>'is_vat_exempt','value'=>'xxxxxxx']
+        ];
+
+        //Save Meta 
+        Facades::saveMeta($metaArr,'order',$SaveOrder['ID']);
+
+        //Save Payment
+        
+
+        //   _payment_method bacs paypal
+        //   _payment_method_title PayPal, حوالة بنكية مباشرة 
+        //   _transaction_id
+
+
+        //Save items
+
+
+
+
+
+        return 'order Saved';
+        //
+
+        return $SaveOrder;
+
+        //Check Cart Items
+
+        //Save Items 
+
+        return 'its Working';
+
+    }
+
+
+    public function GetOrder()
+    {
+        //
+        $getOrders=Order::find(20161);
+        return $getOrders;
+        
     }
 
 

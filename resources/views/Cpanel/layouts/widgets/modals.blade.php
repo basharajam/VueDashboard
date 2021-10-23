@@ -8,7 +8,7 @@
         </div>
         <div class="modal-body">
             <form class="SubmitSection" data-comp="">
-                <label class="form-label">Section // ProdByTax</label>
+                
                 <div class="mb-3">
                     <input type="text" id='title' placeholder="Section Title" name="SectionTitleI"  class="form-control"  >
                 </div>
@@ -24,6 +24,9 @@
                 </div>
                 <div class="mb-3">
                     <input type="number" id="ItemNum" placeholder="Items number" name="ItemNumI" class="form-control" >
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="TransKey" name="TransKeyI" placeholder="Item Translation Key" class="form-control">
                 </div>
                 <div class="mb-3">
                     <input type="text" id="link" placeholder="Link" name="linkI" class="form-control" >
@@ -47,7 +50,7 @@
                         <option value="hide">Hide</option>
                     </select>
                 </div>
-                <input type="hidden" name="compNameI" id="compName">
+                
                 <input type="hidden" name="compId" id='compId'>
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -69,7 +72,7 @@
             </div>
             <div class="modal-body">
                 <form class="SaveCompSection" method="POST" action="{{ route('SaveComp') }}">
-                    <label class="form-label">Section // ProdByTax</label>
+                    
                     <div class="mb-3">
                         <select id="type" name="CompTypeNI" class="form-control">
                             <option value="ProdList"  >ProdList</option>
@@ -86,7 +89,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <input type="text"  placeholder="Component Name" name="CompNameNI"  class="form-control"  >
+                        <input type="text"  placeholder="Translation Key" name="TransKeyNI"  class="form-control"  >
                     </div>
                     <div class="mb-3">
                         <input type="text"  placeholder="Section Title" name="SectionTitleNI"  class="form-control"  >

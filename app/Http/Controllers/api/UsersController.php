@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use Carbon\Carbon;
+use App\Facades;
 
 use Auth;
 
@@ -21,7 +22,7 @@ class UsersController extends Controller
         //validate Inputs 
         $validate = Validator::make(request()->all(), [
             'FirstNameI'=>'required',
-            'lastNameI'=>'required',
+            'LastNameI'=>'required',
             'UserNameI'=>"required|min:8",
             'PassI'=>'required|min:8',
             'Pass2I'=>'required|min:8',
@@ -64,6 +65,18 @@ class UsersController extends Controller
             "user_registered" =>Carbon::now(),
             "display_name" =>$request->input('FirstNameI') . ' '. $request->input('LastNameI'),
         ]);
+
+        //$user=Auth::guard('api')->user();
+
+        //Save Meta 
+        Facades::saveMeta([
+         ['key'=>'nickname','value'=>$request->input('FirstNameI')],
+         ['key'=>'first_name','value'=>$request->input('FirstNameI')],
+         ['key'=>'last_name','value'=>$request->input('LastNameI')],
+         ['key'=>'description','value'=>'  '],
+         ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
+         ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
+        ],'user',$wp_user['id']);
 
         //get JWT Token
         $token=Auth::guard('api')->tokenById($wp_user['id']);
@@ -191,12 +204,12 @@ class UsersController extends Controller
     public function LoginByMail(Request $request)
     {
         //validate Inputs 
-        
+        // return$request->all();
         //Check User
         if(!$token = Auth::guard('api')->attempt(
             array(
-            'user_email'=>$request->input('userMail'),
-            'password'=>$request->input('password')
+              'user_email'=>$request->input('userMail'),
+              'password'=>$request->input('password')
             ))){
                 return 'Baddd';
             }

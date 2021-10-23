@@ -15,16 +15,16 @@ use Corcel\WooCommerce\Model\Product as Corcel;
 class Post extends Corcel
 {
 
-    // public function scopeTranslate($query,$lang)
-    // {
-    //     $element = Translation::where('trid', $this->ID)->where('language_code',$lang)->get();
-    //     if(count($element) > 0){
-    //         return $this->where('ID',$element[0]['element_id'])->first();
-    //     }
-    //     else{
-    //         return $this;
-    //     }
-    // }
+    public function scopeTranslate($query,$lang)
+    {
+        $element = Translation::where('trid', $this->ID)->where('language_code',$lang)->get();
+        if(count($element) > 0){
+            return $this->where('ID',$element[0]['element_id'])->first();
+        }
+        else{
+            return $this;
+        }
+    }
 
     protected $connection = 'wordpress';
 
@@ -32,9 +32,41 @@ class Post extends Corcel
 
 
     //protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
-    protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
+    protected $appends = ['gall','on_sale','cbm','cartqty','variation','type'];
     
+    protected function getGallAttribute(Type $var = null)
+    {
+        # code...
+        $imgArr=[];
+        
+        $thumbnail = $this->thumbnail; // @phpstan-ignore-line
+        //Check Thumbnail
+        if(empty($thumbnail)){
+         //set Default Thumbnail
+          $thumb=(object)array('guid'=>'default Image');
+        }
+        else{
+          $thumb=$thumbnail->attachment;
+        }
 
+        array_push($imgArr,$thumb);
+        $attachmentsId = $this->getMeta('_product_image_gallery');
+
+        //Check Attachments
+        if(empty($attachmentsId)){
+            return $imgArr;
+        }
+        else{
+
+           $attachmentsId = explode(',', $attachmentsId);
+           $attachments   = Attachment::query()->whereIn('ID', $attachmentsId)->get();
+           return  array_merge($imgArr,$attachments->toArray());
+        }
+
+        
+
+
+    }
 
     protected function getCbmAttribute(): ?string
     {

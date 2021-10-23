@@ -5,6 +5,8 @@
         
         e.preventDefault();
 
+        var compName =$('#TransKey').val();
+
         //form 
         var formD=$(this)
         
@@ -14,7 +16,7 @@
         var ItemNum =$('#ItemNum').val();
         var displayMobile =$('#displayMobile').val();
         var displayDesktop =$('#displayDesktop').val();
-        var compName =$('#compName').val();
+        var compName =$('#TransKey').val();
         var compId=$('#compId').val();
         var link =$('#link').val();
         var form= {
@@ -74,7 +76,7 @@
                     $('#ItemNum').val(resp.itemNum)
                     $('#displayMobile').val(resp.mobileDisplay)
                     $('#displayDesktop').val(resp.Display)
-                    $('#compName').val(resp.compName)
+                    $('#TransKey').val(resp.compName)
                     $('#link').val(resp.link) 
                     $('#compId').val(resp.id)
 
