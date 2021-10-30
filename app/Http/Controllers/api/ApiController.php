@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
+use Carbon\Carbon;
 use App\Models\Post;
 use App\Models\PostV;
 use App\Models\TermTaxonomy;
@@ -17,6 +18,7 @@ use App\Models\WpUser;
 use App\Models\otp;
 use App\Models\VueConfig;
 use App\Models\Order;
+use App\Models\OrderItem;
 
 use App\Facades;
 
@@ -689,12 +691,7 @@ class ApiController extends Controller
         //   _transaction_id
 
 
-        //Save items
-
-
-
-
-
+        //Save item
         return 'order Saved';
         //
 
@@ -715,6 +712,171 @@ class ApiController extends Controller
         $getOrders=Order::find(20161);
         return $getOrders;
         
+    }
+
+
+    public function SaveOrderPP(Request $request)
+    {
+
+        //validate inputs 
+        
+
+        //tran_id
+        $transId=$request->input('trans_id');
+
+        //check items 
+        $ItemsArr=$request->input('Items');
+
+        //Full Price
+        $FullPrice=$request->input('FullPrice');
+
+
+        //Save Order 
+        $SaveOrder=new Order;
+        $SaveOrder->post_author=1;
+        $SaveOrder->post_date=Carbon::now();
+        $SaveOrder->post_date_gmt=Carbon::now('UTC');
+        $SaveOrder->post_content= ' ';
+        $SaveOrder->post_title = 'Order &ndash;  '. Carbon::now();
+        $SaveOrder->post_excerpt= 'Saved From Api';
+        $SaveOrder->post_status='wc-on-hold';
+        $SaveOrder->comment_status='open';
+        $SaveOrder->ping_status='closed';
+        $SaveOrder->post_password='wc_order_hasd1231';
+        $SaveOrder->post_name='Order &ndash;  '. Carbon::now();
+        $SaveOrder->to_ping = '  ';
+        $SaveOrder->pinged= ' ';
+        $SaveOrder->post_modified=Carbon::now();
+        $SaveOrder->post_modified_gmt= Carbon::now('UTC');
+        $SaveOrder->post_content_filtered = ' ';
+        $SaveOrder->post_parent=0;
+        $SaveOrder->guid = 'http://www.test.com';
+        $SaveOrder->menu_order=0;
+        $SaveOrder->post_type='shop_order';
+        $SaveOrder->post_mime_type=' ';
+        $SaveOrder->comment_count=0;
+
+        //Save Order Meta`s
+        $SaveOrder->save();
+
+        //set order address
+        $SaveOrder->saveField('_billing_first_name','Blaxk');
+        $SaveOrder->saveField('_billing_last_name','Blaxk Last');
+        $SaveOrder->saveField('_billing_address_1','Blaxk Address');
+        $SaveOrder->saveField('_billing_city','Blaxk Order City');
+        $SaveOrder->saveField('_billing_country','Blaxk Order Country');
+        $SaveOrder->saveField('_billing_address_index','Blaxk');
+
+        //set Order user Inf
+        $SaveOrder->saveField('_billing_email','Blaxk Order Mail');
+        $SaveOrder->saveField('_billing_phone','Blaxk Order Phone');
+
+        //set Shipment Address 
+        $SaveOrder->saveField('_shipping_first_name','Blaxk Ship First Name');
+        $SaveOrder->saveField('_shipping_last_name','Blaxk Ship last name');
+        $SaveOrder->saveField('_shipping_address_1','Blaxk Ship Address ');
+        $SaveOrder->saveField('_shipping_city','Blaxk Ship City');
+        $SaveOrder->saveField('_shipping_country','Blaxk Ship Country');
+        $SaveOrder->saveField('_shipping_address_index','Blaxk');
+        
+        //set payment
+        //   _payment_method bacs paypal
+        //   _payment_method_title PayPal, حوالة بنكية مباشرة 
+        $SaveOrder->saveField('_payment_method','paypal');
+        $SaveOrder->saveField('_payment_method_title','PayPal');
+        $SaveOrder->saveField('_transaction_id',$transId);
+        
+        
+
+        //set discount
+        $SaveOrder->saveField('_cart_discount',0);
+        $SaveOrder->saveField('_cart_discount_tax',0);
+
+        //set order shipping
+        $SaveOrder->saveField('_order_shipping',0);
+        $SaveOrder->saveField('_order_shipping_tax',0);
+        $SaveOrder->saveField('_order_tax',0);
+        $SaveOrder->saveField('_order_currency','USD');
+
+        //set main order mata`s
+        $SaveOrder->saveField('_customer_user',318);
+        $SaveOrder->saveField('_order_currency','USD');
+        $SaveOrder->saveField('is_vat_exempt','USD');
+        $SaveOrder->saveField('_order_total',$FullPrice);
+
+        //set order items
+        $OrderItems = $SaveOrder->items;
+
+        foreach ($ItemsArr as $itemF) {
+            
+            # code...
+            $item=$itemF['item'];
+            $Saveitem = new OrderItem();
+            $Saveitem->order_id = $SaveOrder->ID;
+            $Saveitem->order_item_name =$item['name'];;
+            $Saveitem->order_item_type ="line_item";
+            $Saveitem->save();
+            $Saveitem->createMeta (['_qty'=>$itemF['qty'],'_product_id'=>$item['id'],'_line_subtotal'=>$item['price']]);
+            $OrderItems->add($Saveitem);
+        }
+
+        return $SaveOrder;
+
+        
+
+
+
+        //get & Save Items
+
+
+
+
+        
+
+        // _order_key
+        // _customer_user
+        // _payment_method
+        // _payment_method_title
+        // _customer_ip_address
+        // _customer_user_agent
+
+        // _created_via
+        // _cart_hash
+        // _billing_first_name
+        // _billing_last_name
+        // _billing_address_1
+        // _billing_city
+        // _billing_country
+        // _billing_email
+        // _billing_phone
+
+
+        // _shipping_first_name
+        // _shipping_last_name
+        // _shipping_address_1
+        // _shipping_city
+        // _shipping_country
+
+
+        // _order_currency
+        // _cart_discount
+        // _cart_discount_tax
+        // _order_shipping
+        // _order_shipping_tax
+        // _order_tax
+        // _order_total
+        // _order_version
+
+
+        // _billing_address_index
+        // _shipping_address_index
+
+        // is_vat_exempt
+
+        //return $request->all();
+
+
+
     }
 
 

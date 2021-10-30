@@ -56,6 +56,8 @@ Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@Lo
 
 Route::post('/SaveOrder',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrder']);
 
+Route::post('/SaveOrderPaypal',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderPP']);
+
 Route::get('/GetOrder',['uses'=>'App\Http\Controllers\api\ApiController@GetOrder']);
 
 Route::get('/protected',function(){
