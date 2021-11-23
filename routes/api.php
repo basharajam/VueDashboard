@@ -14,35 +14,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::get('/',function(){
-    return response()->json(['code'=>403,'message'=>'Not Authorized','status'=>false,'item'=>null],403);
-})->name('ApiN');
-
-Route::get('/getConfig',['uses'=>'App\Http\Controllers\api\ApiController@getConfig']);
-
+//Categories
 Route::get('/Categories/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getCategories']);
 
-Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getProds']);
+//
 
-Route::post('/getLayout',['uses'=>'App\Http\Controllers\CpanelController@getLayout','as'=>'getLayout']);
 
-Route::post('/getConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@getConfig','as'=>'getConfig']);
-
+//Products
 Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByCat']);
-
-Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByTag']);
 
 route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdOne']);
 
-Route::get('/test',['uses'=>'App\Http\Controllers\api\ApiController@test']);
+Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByTag']);
 
+Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getProds']);
+
+//
+
+
+
+
+//User
 Route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\api\ApiController@validateCreds']);
 
 Route::post('/RegisterByMail',['uses'=>'App\Http\Controllers\api\UsersController@RegisterByMail']);
+
+Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@LoginByMail']);
 
 Route::get('/redirectF',['uses'=>'App\Http\Controllers\api\UsersController@redirectF']);
 
@@ -52,14 +49,42 @@ Route::get('/ValidateByFaceBook',['uses'=>'App\Http\Controllers\api\UsersControl
 
 Route::get('/ValidateByGoogle',['uses'=>'App\Http\Controllers\api\UsersController@ValidateByGoogle']);
 
-Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@LoginByMail']);
+Route::get('/GetUser',['uses'=>'App\Http\Controllers\api\UsersController@GetUser'])->middleware('auth:api');
 
-Route::post('/SaveOrder',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrder']);
+//
 
-Route::post('/SaveOrderPaypal',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderPP']);
 
-Route::get('/GetOrder',['uses'=>'App\Http\Controllers\api\ApiController@GetOrder']);
+//Rates
+Route::get('/getRate',['uses'=>'App\Http\Controllers\api\ApiController@getRate']);
 
-Route::get('/protected',function(){
-    return 'Done';
-})->middleware('auth:api');
+Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\ApiController@SaveRate']);
+
+//
+
+
+
+//Orders
+Route::post('/SaveOrderPaypal',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderPP'])->middleware('auth:api');
+
+Route::post('/SaveOrderBcs',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderBcs'])->middleware('auth:api');
+
+Route::get('/GetOrder/{status}',['uses'=>'App\Http\Controllers\api\ApiController@GetOrder'])->middleware('auth:api');
+
+//
+
+
+//Cpanel
+Route::post('/getLayout',['uses'=>'App\Http\Controllers\CpanelController@getLayout','as'=>'getLayout']);
+
+Route::get('/getConfig',['uses'=>'App\Http\Controllers\api\ApiController@getConfig']);
+
+Route::post('/getConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@getConfig','as'=>'getConfig']);
+
+//
+
+//Others
+Route::get('/',function(){
+    return response()->json(['code'=>403,'message'=>'Not Authorized','status'=>false,'item'=>null],403);
+})->name('ApiN');
+
+//

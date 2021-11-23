@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserMeta extends Model
 {
     
-    protected $table="wpdm_postmeta";
+    protected $table="wpdm_usermeta";
     protected $primaryKey="umeta_id ";
 
     protected $fillable =  [

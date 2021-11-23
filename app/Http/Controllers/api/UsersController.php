@@ -137,6 +137,8 @@ class UsersController extends Controller
             "display_name" =>$fb_user->getName(),
         ]);
 
+        //Save User Meta
+
         //get Jwt Response
         $token=Auth::guard('api')->tokenById($wp_user['id']);
 
@@ -186,6 +188,9 @@ class UsersController extends Controller
             "display_name" =>$fb_user->getName(),
         ]);
 
+
+        //Save User Meta
+
         //get Jwt Response
         $token=Auth::guard('api')->tokenById($wp_user['id']);
 
@@ -204,14 +209,23 @@ class UsersController extends Controller
     public function LoginByMail(Request $request)
     {
         //validate Inputs 
-        // return$request->all();
+        $validate = Validator::make(request()->all(), [
+            'userMail'=>'required|email',
+            'password'=>"required|min:8",
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'items'=>null],400);
+        }
+
+
         //Check User
         if(!$token = Auth::guard('api')->attempt(
             array(
               'user_email'=>$request->input('userMail'),
               'password'=>$request->input('password')
             ))){
-                return 'Baddd';
+             return response()->json(['code'=>400,'message'=>'Email Or Password Wrong','status'=>false,'items'=>null],400); 
             }
             else{
                 
@@ -220,10 +234,24 @@ class UsersController extends Controller
                 'token'=>$token
               );
 
-             return response()->json(['code'=>200,'message'=>'User Successfully Logged-In','status'=>true,'item'=>$response],200); 
+             return response()->json(['code'=>200,'message'=>'User Successfully Logged-In','status'=>true,'items'=>$response],200); 
             }
         //Done
 
+    }
+
+
+
+    public function GetUser()
+    {
+        //get User
+        $user=Auth::guard('api')->user();
+
+        $response= ['user'=>$user];
+
+        if(!empty($user)){
+            return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>$user], 200);
+        }
     }
 
 
