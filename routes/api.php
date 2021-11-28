@@ -31,3 +31,11 @@ route::get('/ProdOne/{cat}/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\Api
 Route::get('/test',['uses'=>'App\Http\Controllers\ApiController@test']);
 
 route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiController@validateCreds']);
+
+
+//Rates
+Route::get('/getRate',['uses'=>'App\Http\Controllers\api\ApiController@getRate']);
+
+Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\ApiController@SaveRate']);
+
+//
