@@ -247,11 +247,41 @@ class UsersController extends Controller
         //get User
         $user=Auth::guard('api')->user();
 
-        $response= ['user'=>$user];
-
+        //
         if(!empty($user)){
-            return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>$user], 200);
+
+
+           $user['description']=Facades::getMeta('user','description',$user->ID);
+           $user['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
+           $user['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
+           $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
+            
+           return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>['user'=>$user]], 200);
         }
+    }
+
+    public function UpdateUser(Request $request)
+    {
+
+        //get user
+        $user=Auth::guard('api')->user();
+
+        //Update User
+        $arr=[
+            ['key'=>'first_name','value'=>$request->input('FirstNameI')],
+            ['key'=>'last_name','value'=>$request->input('LastNameI')],
+            ['key'=>'description','value'=>'Updated Desription'],
+            ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
+            ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
+            ['key'=>'shipping','value'=>'ttt']
+        ];
+        Facades::saveMeta($arr,'user',$user->ID);
+
+        //get user
+        $u=WpUser::where('ID',$user->ID)->get();
+        
+        return response()->json(['code'=>200,'message'=>'User Informations updated','status'=>true,'items'=>['user'=>$u]], 200);
+        # code...
     }
 
 

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Categories
-Route::get('/Categories/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getCategories']);
+Route::get('/Terms/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getTerms']);
 
 //
 
@@ -50,6 +50,8 @@ Route::get('/ValidateByFaceBook',['uses'=>'App\Http\Controllers\api\UsersControl
 Route::get('/ValidateByGoogle',['uses'=>'App\Http\Controllers\api\UsersController@ValidateByGoogle']);
 
 Route::get('/GetUser',['uses'=>'App\Http\Controllers\api\UsersController@GetUser'])->middleware('auth:api');
+
+Route::post('/UpdateUser',['uses'=>'App\Http\Controllers\api\UsersController@UpdateUser'])->middleware('auth:api');
 
 //
 

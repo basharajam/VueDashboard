@@ -16,11 +16,27 @@ class Facades
       if($type === 'user'){
         //
         foreach ($arr as  $meta) {
-          $saveMeta=new UserMeta;
-          $saveMeta->user_id=$id;
-          $saveMeta->meta_key=$meta['key'];
-          $saveMeta->meta_value=$meta['value'];
-          $saveMeta->save();
+
+          $checkMeta = UserMeta::where('meta_key',$meta['key'])->where('user_id',$id)->first();
+
+          if($checkMeta){
+
+            UserMeta::where('meta_key',$meta['key'])->where('user_id',$id)->update(
+              [
+                'meta_value'=>$meta['value'],
+              ]
+            );
+          }
+          else{
+
+            $saveMeta=new UserMeta;
+            $saveMeta->user_id=$id;
+            $saveMeta->meta_key=$meta['key'];
+            $saveMeta->meta_value=$meta['value'];
+            $saveMeta->save();
+
+          }
+
         };
       }
       elseif($type === 'order'){
@@ -36,8 +52,18 @@ class Facades
     }
 
 
+    static function getMeta($type,$key,$userId)
+    {
+      if($type === 'user'){
+
+        $meta =  UserMeta::where('meta_key',$key)->where('user_id',$userId)->first();
+        return $meta['meta_value'];
+
+      }
+      
 
 
+    }
 
 }
 

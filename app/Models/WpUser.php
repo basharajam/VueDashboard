@@ -8,13 +8,21 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class WpUser extends Authenticatable implements JWTSubject
+use Corcel\Model\User;
+use Corcel\Concerns\Aliases;
+use Corcel\Concerns\MetaFields;
+use Corcel\Concerns\AdvancedCustomFields;
+
+class WpUser extends User implements JWTSubject
 {
 
     use HasFactory;
+    use AdvancedCustomFields;
+    use Aliases;
+    use MetaFields;
 
 
-    protected $table = 'wpdm_users';
+    protected $table = 'users';
     protected $primaryKey = 'ID';
     
     protected $fillable =  [
@@ -32,6 +40,25 @@ class WpUser extends Authenticatable implements JWTSubject
     protected $hidden = [
         'user_pass'
     ];
+
+
+    //get user meta
+    protected $with = ['meta'];
+
+    protected static $aliases = [
+        'login' => 'user_login',
+        'email' => 'user_email',
+        'slug' => 'user_nicename',
+        'url' => 'user_url',
+        'nickname' => ['meta' => 'nickname'],
+        'first_name' => ['meta' => 'first_name'],
+        'last_name' => ['meta' => 'last_name'],
+        'billing_first_name'=> ['meta' => 'billing_first_name'],
+        'billing_last_name'=>['meta' => 'billing_last_name'],
+        'description' => ['meta' => 'description'],
+        'created_at' => 'user_registered',
+    ];
+    
 
     public function getJWTIdentifier()
     {

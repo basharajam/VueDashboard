@@ -19,7 +19,9 @@ class PostV extends Corcel
     protected $postType='product_variation';
 
 
-    protected $appends = ['cbm','cartqty','type'];
+    //protected $appends = ['cbm','cartqty','type'];
+    
+    protected $appends=['gallery','on_sale','cbm','cartqty','variation','type','avg_rate','min_qty','price'];
 
     public function scopeTranslate($query,$lang)
     {
@@ -33,16 +35,32 @@ class PostV extends Corcel
     }
 
 
+    protected  function getPriceAttribute(): ?string
+    {
+        return $this->getMeta('_regular_price');
+    }
 
     protected function getCbmAttribute(): ?string
     {
         return $this->getMeta('al_cbm');
     }
-
     protected function getCartqtyAttribute(): ?string
     {
         return $this->getMeta('al_carton_qty');
     }
+
+    protected function getAvgRateAttribute()
+    {
+        return $this->getMeta('_wc_average_rating');
+    }
+
+    protected function getMinQtyAttribute()
+    {
+        return $this->getMeta('_wc_min_qty_product');
+    }
+
+
+
 
 }
 

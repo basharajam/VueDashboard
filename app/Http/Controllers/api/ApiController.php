@@ -51,7 +51,7 @@ class ApiController extends Controller
     }
 
     //
-    public function getCategories($cur,$ship)
+    public function getTerms($cur,$ship)
     {
         //getCategories
         $getCat=TermTaxonomy::where('taxonomy','product_cat')->where('parent',0)->pluck('term_id');
@@ -73,6 +73,25 @@ class ApiController extends Controller
         });
 
 
+        //getTags
+        $getTerm=TermTaxonomy::where('taxonomy','product_tag')->where('parent',0)->pluck('term_id');
+        $getTermTag=Term::whereIn('term_id',$getTerm)->get();
+        $transTag=$getTermTag->map(function($item){
+
+            if(!empty($item->taxonomy->image->guid)){
+                $img=$item->taxonomy->image->guid;
+            }
+            else{
+                $img='';
+            }
+            return [
+                'name'=>$item->name,
+                'slug'=>$item->slug,
+                'image'=>(object)array('src'=>$img),
+                'sub'=>$item->taxonomy->sub
+            ];
+        });
+
         $response=array();
 
         //Get Components Desktop
@@ -85,8 +104,9 @@ class ApiController extends Controller
         $response['desktop'] = $DesktopResponse;
         $response['mobile'] = $mobileResponse;
         $response['Categories'] = $transCat;
+        $response['Tags'] = $transTag;
 
-        return response()->json($response, 200);
+        return response()->json(['status'=>true,'items'=>$response], 200);
 
         // return response()->json($transCat, 200);
     }
@@ -481,7 +501,7 @@ class ApiController extends Controller
                 //Set Shipment And Curr 
                 if($item['type'] === 'variable'){
 
-                    $VarProd= PostV::where('post_parent',$item['ID'])->get();
+                    $VarProd= PostV::where('post_parent',$item['ID'])->where('post_type','product_variation')->get();
                     $CbmArr=array();
                     $QtyArr=array();
                     $regularPArr=array();
@@ -516,12 +536,12 @@ class ApiController extends Controller
                         'sale_price'=>$priceX['salePriceHtml'],
                         'price'=>$priceX['regPriceHtml'],
                         'price_html'=>$priceX['price_html'],
-                        'images'=>$item['gall'],
+                        'gallery'=>$item['gallery'],
                         'meta'=>$item->meta
                     ];
                 }
                 elseif($item['type'] === 'variable'){
-    
+                    
                     $transProdOne= [
                         'id'=>$item->ID,
                         'type'=>$item['type'],
@@ -535,10 +555,13 @@ class ApiController extends Controller
                         'min_sale_price'=>$priceX['minSaleFullPriceHtml'],
                         'max_sale_price'=>$priceX['maxSaleFullPriceHtml'],
                         'price_html'=>$priceX['price_html'],
-                        'images'=>$item['gall'],
+                        'gallery'=>$item['gallery'],
+                        'variations'=>$VarProd,
                         'meta'=>$item->meta
                     ];
                 }
+
+                
 
                 return $transProdOne;
             }
