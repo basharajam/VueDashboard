@@ -13,6 +13,8 @@ use App\Models\PostAll;
 use App\Models\VueLayouts;
 use App\Models\WpUser;
 use App\Models\otp;
+use App\Models\rating;
+
 class ApiController extends Controller
 {
 

@@ -34,8 +34,8 @@ route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\ApiControlle
 
 
 //Rates
-Route::get('/getRate',['uses'=>'App\Http\Controllers\api\ApiController@getRate']);
+Route::get('/getRate',['uses'=>'App\Http\Controllers\ApiController@getRate']);
 
-Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\ApiController@SaveRate']);
+Route::post('/SaveRate',['uses'=>'App\Http\Controllers\ApiController@SaveRate']);
 
 //
