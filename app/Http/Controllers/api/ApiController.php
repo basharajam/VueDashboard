@@ -287,11 +287,15 @@ class ApiController extends Controller
                 $ProdBy=null;
             }
         }
+        elseif($type === 'search'){
+
+            $ProdBy=Post::published()->where('post_title','like', '%'.$tax.'%' )
+            ->limit($limit)->get();
+        }
  
         
         //Transform Product Object
         $trans=$ProdBy->map(function($item) use ($tax,$cur,$ship,$limit,$title,$link,$compType,$compName,$Display,$mobileDisplay) {
-
 
             if($item['type'] === 'variable'){
 
@@ -350,7 +354,8 @@ class ApiController extends Controller
                     'price'=>$priceX['regPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
-                    'Category'=>$item->Categories[0]->term
+                    'Category'=>$item->Categories[0]->term,
+                    'created_at'=>$item->post_date
                     // 'meta'=>$item->meta
                 ];
             }
@@ -371,7 +376,8 @@ class ApiController extends Controller
                     'max_sale_price'=>$priceX['maxSaleFullPriceHtml'],
                     'price_html'=>$priceX['price_html'],
                     'images'=>$imgArr,
-                    'Category'=>$item->Categories[0]->term
+                    'Category'=>$item->Categories[0]->term,
+                    'created_at'=>$item->post_date
                     // 'meta'=>$item->meta
                 ];
             }
@@ -612,8 +618,6 @@ class ApiController extends Controller
     public function ProdByTag($tag,$cur,$ship)
     {
 
-        //return $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
-        
         if(!empty($tag)){
             
             $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
@@ -673,13 +677,14 @@ class ApiController extends Controller
             }
             elseif($status === 'all'){
 
-                //$getall=Order::where('post_author',$user->ID)->get();
-                //$getOrders->groupBy('post_status');
                 $getOrders=Order::where('post_author',$user->ID)->get();
             }
             else{
                 return 'Worng Status';
             }
+
+            $getOrders->load('items');
+            $getOrders->load('customer');
 
             return response()->json(['status'=>true,'items'=>$getOrders], 200,);
 
@@ -1027,6 +1032,96 @@ class ApiController extends Controller
 
         return response()->json($getRates, 200);
 
+    }
+
+
+    public function Search($value,$sort,$limit,$minprice,$maxprice,$filter,$rate,$cur,$ship)
+    {
+
+        $init=$this->getProdBy($value,$limit,$cur,$ship,'search','','','','','','');
+        $posts=$init['items'];
+        $posts=$posts->toArray();
+        //Check filtter
+        switch ($filter) {
+            case 'PriceHighToLow':
+                
+                // Desc sort
+                usort($posts,function($first,$second){
+                    return $first['price'] < $second['price'] ? 1 : -1;
+                });
+                
+
+                break;
+            case 'PriceLowToHigh':
+
+                //Asc Sort
+                usort($posts,function($first,$second){
+                    return $first['price'] > $second['price'] ? 1 : -1;
+                });
+
+                break;
+            case 'Recommendations':
+                
+                //get recommendations
+                
+
+
+                break;
+            case 'RatingHighToLow':
+
+                usort($posts,function($first,$second){
+                    return $first['avg_rate'] < $second['avg_rate'] ? 1 : -1;
+                });
+
+                break;
+            case 'RatingLowToHigh':
+                
+                usort($posts,function($first,$second){
+                    return $first['avg_rate'] > $second['avg_rate'] ? 1 : -1;
+                });
+
+
+                break;
+            case 'HasSale':
+
+                $hasSale=array_filter($posts,function($items){
+                    return $items['on_sale'] == true;
+                });
+
+                $posts=$hasSale;
+
+                break;  
+            case 'New':
+                
+                usort($posts,function($first,$second){
+                    return $first['created_at'] < $second['created_at'] ? 1 : -1;
+                });
+
+                break;
+        }
+
+        //min & max price range & rate filter
+        $filterdPosts= array_filter($posts,function($item) use($minprice,$maxprice,$rate)  {
+
+            if($item['type'] === 'variable'){
+                return $item['min_regular_price'] > $minprice && $item['min_regular_price'] <= $maxprice;
+            }
+            elseif($item['type'] === 'simple'){
+                return $item['price'] > $minprice && $item['price'] <= $maxprice && $item['average_rating'] <= $rate  ;
+            }
+
+        });
+
+        $postsArr=array();
+
+        foreach ($filterdPosts as $value) {
+          array_push($postsArr,$value);
+        }
+
+        return response()->json([
+            'status'=>true,
+            'items'=>$postsArr
+        ], 200);
     }
 
 

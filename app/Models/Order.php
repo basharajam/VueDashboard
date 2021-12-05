@@ -10,5 +10,4 @@ class Order extends Corcel
 {
     use HasFactory;
     
-
 }

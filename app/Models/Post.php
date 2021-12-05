@@ -32,7 +32,7 @@ class Post extends Corcel
 
 
     //protected $appends = ['gallery','on_sale','cbm','cartqty','variation','type'];
-    protected $appends = ['gall','on_sale','cbm','cartqty','variation','type'];
+    protected $appends = ['gall','on_sale','cbm','cartqty','variation','type','price','avg_rate'];
     
     protected function getGallAttribute(Type $var = null)
     {
@@ -62,10 +62,11 @@ class Post extends Corcel
            $attachments   = Attachment::query()->whereIn('ID', $attachmentsId)->get();
            return  array_merge($imgArr,$attachments->toArray());
         }
+    }
 
-        
-
-
+    protected  function getPriceAttribute(): ?string
+    {
+        return $this->getMeta('_regular_price');
     }
 
     protected function getCbmAttribute(): ?string
@@ -81,6 +82,10 @@ class Post extends Corcel
         return $this->getMeta('al_carton_qty');
     }
 
+    protected function getAvgRateAttribute()
+    {
+        return $this->getMeta('_wc_average_rating');
+    }
 
 
 

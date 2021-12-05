@@ -29,6 +29,8 @@ Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\Ap
 
 Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getProds']);
 
+Route::get('/Search/{value}/{sort}/{limit}/{minprice}/{maxprice}/{filter}/{rate}/{curr}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@Search']);
+
 //
 
 
@@ -38,6 +40,8 @@ Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiContro
 Route::get('validate/{type}/{value}',['uses'=>'App\Http\Controllers\api\ApiController@validateCreds']);
 
 Route::post('/RegisterByMail',['uses'=>'App\Http\Controllers\api\UsersController@RegisterByMail']);
+
+Route::post('/RegisterByMobile',['uses'=>'App\Http\Controllers\api\UsersController@RegisterByMobile']);
 
 Route::post('/LoginByMail',['uses'=>'App\Http\Controllers\api\UsersController@LoginByMail']);
 

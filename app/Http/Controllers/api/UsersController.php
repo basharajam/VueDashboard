@@ -18,7 +18,8 @@ class UsersController extends Controller
     //
     public function RegisterByMail(Request $request)
     {
-
+        
+        //return $request->all();
         //validate Inputs 
         $validate = Validator::make(request()->all(), [
             'FirstNameI'=>'required',
@@ -30,7 +31,7 @@ class UsersController extends Controller
         ]);
 
         if ($validate->fails()) {
-            return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'item'=>null],400);
+          return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'item'=>null],400);
         }
 
         //Check Mail Is Unique 
@@ -76,7 +77,7 @@ class UsersController extends Controller
          ['key'=>'description','value'=>'  '],
          ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
          ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
-        ],'user',$wp_user['id']);
+        ],'user',$wp_user['ID']);
 
         //get JWT Token
         $token=Auth::guard('api')->tokenById($wp_user['id']);
@@ -92,6 +93,49 @@ class UsersController extends Controller
 
 
     }
+
+
+    public function RegisterByMobile(Request $request)
+    {
+        //
+        //validate Inputs 
+        $validate = Validator::make(request()->all(), [
+            'FirstNameI'=>'required',
+            'LastNameI'=>'required',
+            'UserNameI'=>"required|min:8",
+            'PassI'=>'required|min:8',
+            'Pass2I'=>'required|min:8',
+            'PhoneI'=>'required|email',
+        ]);
+
+        if ($validate->fails()) {
+          return response()->json(['code'=>400,'message'=>'Validation Error','status'=>false,'item'=>null],400);
+        }
+
+        //Check Passwords Are Matches
+        $Pass1=$request->input('PassI');
+        $Pass2=$request->input('Pass2I');
+        if($Pass1 != $Pass2){
+            return response()->json(['code'=>400,'message'=>'Passwords Not  matches','status'=>false,'item'=>null],400);
+        }
+
+        //Bcrypt password
+        $bcryptpass=bcrypt($Pass1);
+
+        //Save User 
+        $wp_user = WpUser::create([
+            "user_login" =>$request->input('UserNameI'),
+            "user_pass"=>$bcryptpass ,
+            "user_nicename" =>$request->input('FirstNameI'),
+            "user_email"=>$request->input('MailI'),
+            "user_url" =>'',
+            "user_registered" =>Carbon::now(),
+            "display_name" =>$request->input('FirstNameI') . ' '. $request->input('LastNameI'),
+        ]);
+
+
+    }
+
 
     public function redirectF()
     {
@@ -224,18 +268,29 @@ class UsersController extends Controller
             array(
               'user_email'=>$request->input('userMail'),
               'password'=>$request->input('password')
-            ))){
+        ))){
              return response()->json(['code'=>400,'message'=>'Email Or Password Wrong','status'=>false,'items'=>null],400); 
             }
-            else{
+        else{
+
+             //get user
+             $user=Auth::guard('api')->user();
+
+             $user['description']=Facades::getMeta('user','description',$user->ID);
+             $user['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
+             $user['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
+             $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
+              
                 
               $response=array(
-                'user'=>Auth::guard('api')->user(),
+                'user'=>$user,
                 'token'=>$token
               );
 
+
              return response()->json(['code'=>200,'message'=>'User Successfully Logged-In','status'=>true,'items'=>$response],200); 
-            }
+       
+        }
         //Done
 
     }
@@ -257,6 +312,8 @@ class UsersController extends Controller
            $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
             
            return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>['user'=>$user]], 200);
+        
+        
         }
     }
 
@@ -266,6 +323,26 @@ class UsersController extends Controller
         //get user
         $user=Auth::guard('api')->user();
 
+        //first_name //
+        //last_name //
+        //description //
+        ///billing_first_name //
+        //billing_last_name //
+        //billing_company
+        //billing_address_1
+        //billing_address_2
+        //billing_city
+        //billing_country
+        //billing_email
+        //billing_phone
+        //shipping_first_name
+        //shipping_last_name
+        //shipping_company
+        //shipping_address_1
+        //shipping_address_2
+        //shipping_city
+
+
         //Update User
         $arr=[
             ['key'=>'first_name','value'=>$request->input('FirstNameI')],
@@ -273,7 +350,8 @@ class UsersController extends Controller
             ['key'=>'description','value'=>'Updated Desription'],
             ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
             ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
-            ['key'=>'shipping','value'=>'ttt']
+            ['key'=>'shipping','value'=>''],
+            ['key'=>'billing_address_1'],
         ];
         Facades::saveMeta($arr,'user',$user->ID);
 
@@ -282,6 +360,7 @@ class UsersController extends Controller
         
         return response()->json(['code'=>200,'message'=>'User Informations updated','status'=>true,'items'=>['user'=>$u]], 200);
         # code...
+
     }
 
 
