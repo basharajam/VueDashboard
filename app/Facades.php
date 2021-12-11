@@ -14,6 +14,7 @@ class Facades
     {
 
       if($type === 'user'){
+
         //
         foreach ($arr as  $meta) {
 
@@ -57,7 +58,12 @@ class Facades
       if($type === 'user'){
 
         $meta =  UserMeta::where('meta_key',$key)->where('user_id',$userId)->first();
-        return $meta['meta_value'];
+        if(empty($meta)){
+          return null;
+        }
+        else{
+          return $meta['meta_value'];
+        }
 
       }
       

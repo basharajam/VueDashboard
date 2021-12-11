@@ -279,8 +279,14 @@ class UsersController extends Controller
              $user['description']=Facades::getMeta('user','description',$user->ID);
              $user['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
              $user['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
+             $user['billing_address_1']=Facades::getMeta('user','billing_address_1',$user->ID);
+             $user['billing_address_2']=Facades::getMeta('user','billing_address_2',$user->ID);
+             $user['shipping_first_name']=Facades::getMeta('user','shipping_first_name',$user->ID);
+             $user['shipping_last_name']=Facades::getMeta('user','shipping_last_name',$user->ID);
+             $user['shipping_address_1']=Facades::getMeta('user','shipping_address_1',$user->ID);
+             $user['shipping_address_2']=Facades::getMeta('user','shipping_address_2',$user->ID);
+             $user['shipping_city']=Facades::getMeta('user','shipping_city',$user->ID);
              $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
-              
                 
               $response=array(
                 'user'=>$user,
@@ -305,14 +311,18 @@ class UsersController extends Controller
         //
         if(!empty($user)){
 
-
-           $user['description']=Facades::getMeta('user','description',$user->ID);
-           $user['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
-           $user['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
-           $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
-            
-           return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>['user'=>$user]], 200);
-        
+            $user['description']=Facades::getMeta('user','description',$user->ID);
+            $user['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
+            $user['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
+            $user['billing_address_1']=Facades::getMeta('user','billing_address_1',$user->ID);
+            $user['billing_address_2']=Facades::getMeta('user','billing_address_2',$user->ID);
+            $user['shipping_first_name']=Facades::getMeta('user','shipping_first_name',$user->ID);
+            $user['shipping_last_name']=Facades::getMeta('user','shipping_last_name',$user->ID);
+            $user['shipping_address_1']=Facades::getMeta('user','shipping_address_1',$user->ID);
+            $user['shipping_address_2']=Facades::getMeta('user','shipping_address_2',$user->ID);
+            $user['shipping_city']=Facades::getMeta('user','shipping_city',$user->ID);
+            $user['shipping']=Facades::getMeta('user','shipping',$user->ID);
+            return response()->json(['code'=>200,'message'=>'User Informations','status'=>true,'items'=>['user'=>$user]], 200);
         
         }
     }
@@ -335,29 +345,63 @@ class UsersController extends Controller
         //billing_country
         //billing_email
         //billing_phone
+
         //shipping_first_name
         //shipping_last_name
         //shipping_company
         //shipping_address_1
         //shipping_address_2
         //shipping_city
-
-
-        //Update User
-        $arr=[
-            ['key'=>'first_name','value'=>$request->input('FirstNameI')],
-            ['key'=>'last_name','value'=>$request->input('LastNameI')],
-            ['key'=>'description','value'=>'Updated Desription'],
-            ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
-            ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
-            ['key'=>'shipping','value'=>''],
-            ['key'=>'billing_address_1'],
-        ];
-        Facades::saveMeta($arr,'user',$user->ID);
-
-        //get user
-        $u=WpUser::where('ID',$user->ID)->get();
         
+        //Update User
+        if($request->input('From') === 'Billing'){
+
+            $arr=[
+                ['key'=>'billing_first_name','value'=>$request->input('FirstNameI')],
+                ['key'=>'billing_last_name','value'=>$request->input('LastNameI')],
+                ['key'=>'billing_address_1','value'=>$request->input('BillingAddressI')],
+                ['key'=>'billing_country','value'=>$request->input('BillingCountryI')],
+                ['key'=>'billing_address_2','value'=>$request->input('BillingAddress2I')],
+            ];
+
+        }
+        elseif($request->input('From') === 'Shipment'){
+
+            $arr=[
+                ['key'=>'shipping_first_name','value'=>$request->input('FirstNameI')],
+                ['key'=>'shipping_last_name','value'=>$request->input('LastNameI')],
+                ['key'=>'shipping_country','value'=>$request->input('ShipmentCountryI')],
+                ['key'=>'shipping_address_1','value'=>$request->input('ShipmentAddressI')],
+                ['key'=>'shipping_address_2','value'=>$request->input('ShipmentAddress2I')],
+            ];
+
+        }
+        elseif($request->input('From') === 'User'){
+
+            $arr=[
+                ['key'=>'first_name','value'=>$request->input('FirstNameI')],
+                ['key'=>'last_name','value'=>$request->input('LastNameI')],       
+            ];
+
+        }
+    
+        
+        Facades::saveMeta($arr,'user',$user->ID);
+        //get user
+        $u=WpUser::where('ID',$user->ID)->first();
+        $u['description']=Facades::getMeta('user','description',$user->ID);
+        $u['billing_first_name']=Facades::getMeta('user','billing_first_name',$user->ID);
+        $u['billing_last_name']=Facades::getMeta('user','billing_last_name',$user->ID);
+        $u['billing_address_1']=Facades::getMeta('user','billing_address_1',$user->ID);
+        $u['billing_address_2']=Facades::getMeta('user','billing_address_2',$user->ID);
+        $u['shipping_first_name']=Facades::getMeta('user','shipping_first_name',$user->ID);
+        $u['shipping_last_name']=Facades::getMeta('user','shipping_last_name',$user->ID);
+        $u['shipping_address_1']=Facades::getMeta('user','shipping_address_1',$user->ID);
+        $u['shipping_address_2']=Facades::getMeta('user','shipping_address_2',$user->ID);
+        $u['shipping_city']=Facades::getMeta('user','shipping_city',$user->ID);
+        $u['shipping']=Facades::getMeta('user','shipping',$user->ID);
+        
+
         return response()->json(['code'=>200,'message'=>'User Informations updated','status'=>true,'items'=>['user'=>$u]], 200);
         # code...
 

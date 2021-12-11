@@ -70,11 +70,11 @@ Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\ApiController@SaveRat
 
 
 //Orders
-Route::post('/SaveOrderPaypal',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderPP'])->middleware('auth:api');
+Route::post('/SaveOrderPaypal',['uses'=>'App\Http\Controllers\api\OrderController@SaveOrderPP'])->middleware('auth:api');
 
-Route::post('/SaveOrderBcs',['uses'=>'App\Http\Controllers\api\ApiController@SaveOrderBcs'])->middleware('auth:api');
+Route::post('/SaveOrderBcs',['uses'=>'App\Http\Controllers\api\OrderController@SaveOrderBcs'])->middleware('auth:api');
 
-Route::get('/GetOrder/{status}',['uses'=>'App\Http\Controllers\api\ApiController@GetOrder'])->middleware('auth:api');
+Route::get('/GetOrder/{status}',['uses'=>'App\Http\Controllers\api\OrderController@GetOrder'])->middleware('auth:api');
 
 //
 
