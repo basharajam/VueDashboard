@@ -15,25 +15,23 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Categories
-Route::get('/Terms/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getTerms']);
+Route::get('/Terms/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@getTerms']);
 
 //
 
 
 //Products
-Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByCat']);
+Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByCat']);
 
-route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdOne']);
+route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdOne']);
 
-Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@ProdByTag']);
+Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByTag']);
 
-Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@getProds']);
+Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@getProds']);
 
-Route::get('/Search/{value}/{sort}/{limit}/{minprice}/{maxprice}/{filter}/{rate}/{curr}/{ship}',['uses'=>'App\Http\Controllers\api\ApiController@Search']);
+Route::get('/Search/{value}/{sort}/{limit}/{minprice}/{maxprice}/{filter}/{rate}/{curr}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@Search']);
 
 //
-
-
 
 
 //User
@@ -61,9 +59,9 @@ Route::post('/UpdateUser',['uses'=>'App\Http\Controllers\api\UsersController@Upd
 
 
 //Rates
-Route::get('/getRate',['uses'=>'App\Http\Controllers\api\ApiController@getRate']);
+Route::get('/getRate',['uses'=>'App\Http\Controllers\api\RateController@getRate']);
 
-Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\ApiController@SaveRate']);
+Route::post('/SaveRate',['uses'=>'App\Http\Controllers\api\RateController@SaveRate']);
 
 //
 
