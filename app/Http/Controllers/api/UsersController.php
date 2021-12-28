@@ -18,7 +18,6 @@ class UsersController extends Controller
     //
     public function RegisterByMail(Request $request)
     {
-        
         //return $request->all();
         //validate Inputs 
         $validate = Validator::make(request()->all(), [

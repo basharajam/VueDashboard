@@ -46,18 +46,25 @@ Route::prefix('Cpanel')->group(function () {
 
     route::post('DelComp',['uses'=>'App\Http\Controllers\CpanelController@DelComp','as'=>'DelComp']);
 
+
     
+    
+  });
+  route::prefix('Config')->group(function () {
+      
     //Configs
     route::get('Shipment',['uses'=>'App\Http\Controllers\Cpanel\configController@ShipmentConfig','as'=>'ShipmentConfig']);
-
+    
     route::get('Currency',['uses'=>'App\Http\Controllers\Cpanel\configController@CurrencyConfig','as'=>'CurrencyConfig']);
     
     route::get('main',['uses'=>'App\Http\Controllers\Cpanel\configController@MainConfig','as'=>'MainConfig']);
-
+    
     route::post('SaveConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@SaveConfig','as'=>'SaveConfig']);
-
+    
     route::post('UpdConfig',['uses'=>'App\Http\Controllers\Cpanel\configController@UpdConfig','as'=>'UpdConfig']);
+  
+  });
 
 
-   });
+
 });

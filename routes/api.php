@@ -21,13 +21,13 @@ Route::get('/Terms/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductContr
 
 
 //Products
-Route::get('/ProdByCat/{cat}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByCat']);
+Route::get('/ProdByCat/{cat}/{cur}/{ship}/{breakpoint}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByCat']);
 
 route::get('/ProdOne/{id}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdOne']);
 
-Route::get('/ProdByTag/{tag}/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByTag']);
+Route::get('/ProdByTag/{tag}/{cur}/{ship}/{breakpoint}',['uses'=>'App\Http\Controllers\api\ProductController@ProdByTag']);
 
-Route::get('/Products/{cur}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@getProds']);
+Route::get('/Products/{cur}/{ship}/{breakpoint}',['uses'=>'App\Http\Controllers\api\ProductController@getProds']);
 
 Route::get('/Search/{value}/{sort}/{limit}/{minprice}/{maxprice}/{filter}/{rate}/{curr}/{ship}',['uses'=>'App\Http\Controllers\api\ProductController@Search']);
 

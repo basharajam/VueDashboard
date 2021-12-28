@@ -305,18 +305,16 @@ class ProductController extends Controller
        foreach ($data as $item) {
 
            if($item['compType'] === 'ProdList' ){
-
-               $ProdByTax=$this->getProdBy($item['value'],$item['itemNum'],$cur,$ship,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
-               array_push($arr,$ProdByTax);
-
+            $ProdByTax=$this->getProdBy($item['value'],$item['itemNum'],$cur,$ship,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
+            array_push($arr,$ProdByTax);
            }
            elseif($item['compType'] === 'banner'){
-               $cmpArr=array('items'=>null,'count'=>$item['itemNum'],'title'=>$item['title'],'link'=>$item['link'],'type'=>$item['compType'],'value'=>$item['value'],'name'=>$item['compName'],'Display'=>$item['Display'],'mobileDisplay'=>$item['mobileDisplay']);
-               array_push($arr,$cmpArr);
+            $cmpArr=array('items'=>null,'count'=>$item['itemNum'],'title'=>$item['title'],'link'=>$item['link'],'type'=>$item['compType'],'value'=>$item['value'],'name'=>$item['compName'],'Display'=>$item['Display'],'mobileDisplay'=>$item['mobileDisplay']);
+            array_push($arr,$cmpArr);
            }
            elseif($item['compType'] === 'ProdInBox'){
-               $ProdInBox=$this->getProdBy($item['value'],$item['itemNum'],$cur,$ship,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
-               array_push($arr,$ProdInBox);
+            $ProdInBox=$this->getProdBy($item['value'],$item['itemNum'],$cur,$ship,$item['type'],$item['title'],$item['link'],$item['compType'],$item['compName'],$item['Display'],$item['mobileDisplay']);
+            array_push($arr,$ProdInBox);
            }
        }
 
@@ -324,26 +322,31 @@ class ProductController extends Controller
    }
 
 
-   public function getProds($cur,$ship)
+   public function getProds($cur,$ship,$breakpoint)
    {
 
        set_time_limit(0);
-
-       //get Products By Tag id
     
        $response=array();
 
-       //Get Components Desktop
-       $getLayoutsLists=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
-       $DesktopResponse=$this->responseLayout($getLayoutsLists,$cur,$ship);
-       $getLayoutsListsMobile=VueLayouts::where('wherePage','landing')->where('mobileDisplay','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
-       $mobileResponse=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
-       $ProdInBox=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','ProdInBox')->orderBy('sort','desc')->get();           
-       $ProdInBoxResponse=$this->responseLayout($ProdInBox,$cur,$ship);
-
-       $response['desktop'] = $DesktopResponse;
-       $response['mobile'] = $mobileResponse;
-       $response['ProdInBox'] = $ProdInBoxResponse;
+        if($breakpoint === 'md' || $breakpoint === 'lg'){
+            //Get Components Desktop
+            $getLayoutsLists=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+            $DesktopResponse=$this->responseLayout($getLayoutsLists,$cur,$ship);
+            $ProdInBox=VueLayouts::where('wherePage','landing')->where('Display','!=','hide')->where('compType','ProdInBox')->orderBy('sort','desc')->get();           
+            $ProdInBoxResponse=$this->responseLayout($ProdInBox,$cur,$ship);
+            $response['desktop'] = $DesktopResponse;
+            $response['ProdInBox'] = $ProdInBoxResponse;
+        }
+        elseif($breakpoint === 'sm'){
+            //Get Components Mobile
+            $getLayoutsListsMobile=VueLayouts::where('wherePage','landing')->where('mobileDisplay','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+            $mobileResponse=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+            $response['mobile'] = $mobileResponse;
+        }
+        else{
+            return 'wrong breakpoint';
+        }
 
        return response()->json($response, 200);
    }
@@ -436,61 +439,78 @@ class ProductController extends Controller
        } 
    }
 
-   public function ProdByCat($cat,$cur,$ship)
+   public function ProdByCat($cat,$cur,$ship,$breakpoint)
    {
 
+        //get limit config 
+        $catLimit=VueConfig::where('key','CategoryItemsCount')->where('type','main')->first();
+
+        //return $cat;
        //get Products By Category 
        if(!empty($cat)){
-
-           //Check & get Category 
-               //Check Category
-                   // $CheckCat=TermTaxonomy::where('term_id',$getCat['term_id'])->where('taxonomy','product_cat')->first();
-           $getPosts=$this->getProdBy($cat,12,$cur,$ship,'category','','','ProdList','ProdByCatList','list','list');
-
+        //Check & get Category 
+        $getPosts=$this->getProdBy($cat,$catLimit['value'],$cur,$ship,'category','','','ProdList','ProdByCatList','list','list');
        }
        else{
-           $getPosts=null;
+        $getPosts=null;
        }
-       
-       //get Prod By Cat layout 
-       $getLayoutsLists=VueLayouts::where('wherePage','ProdByCat')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
-       $res=$this->responseLayout($getLayoutsLists,$cur,$ship);
-       $getLayoutsListsMobile=VueLayouts::where('wherePage','ProdByCat')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
-       $res2=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
 
+       //get Prod By Cat layout 
+       
        //response
        $response=array();
        $response['category']=$getPosts;
-       $response['desktop']=$res;
-       $response['mobile']=$res2;
+       if($breakpoint === 'sm'){
+           $getLayoutsListsMobile=VueLayouts::where('wherePage','ProdByCat')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+           $res2=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+           $response['mobile']=$res2;
+        }
+        elseif($breakpoint === 'md' || $breakpoint === 'lg'){
+           $getLayoutsLists=VueLayouts::where('wherePage','ProdByCat')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+           $res=$this->responseLayout($getLayoutsLists,$cur,$ship);
+           $response['desktop']=$res;
+       }
+       else{
+           return 'wrong breakpoint';
+       }
 
        return response()->json($response, 200);
-
    }
 
 
 
-   public function ProdByTag($tag,$cur,$ship)
+   public function ProdByTag($tag,$cur,$ship,$breakpoint)
    {
 
+        //get limit config 
+        $tagLimit=VueConfig::where('key','TagItemsCount')->where('type','main')->first();
+
        if(!empty($tag)){
-           
-           $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
-           $getPosts=$this->getProdBy($getTag['value'],12,$cur,$ship,'tag','','','ProdList','ProdByCatList','list','list');
+        $getTag=VueLayouts::where('type','tag')->where('title',$tag)->first();
+        $getPosts=$this->getProdBy($getTag['value'],$tagLimit['value'],$cur,$ship,'tag','','','ProdList','ProdByCatList','list','list');
        }
        else{
-           $getPosts=null;
+        $getPosts=null;
        }
 
-       $getLayoutsLists=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
-       $res=$this->responseLayout($getLayoutsLists,$cur,$ship);
-       $getLayoutsListsMobile=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
-       $res2=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+       if($breakpoint ==='sm' ){
+        $getLayoutsListsMobile=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sortMobile','asc')->get();
+        $res2=$this->responseLayout($getLayoutsListsMobile,$cur,$ship);
+        $response['mobile']=$res2;
+       }
+       elseif($breakpoint ==='md' || $breakpoint === 'lg'){
+        $getLayoutsLists=VueLayouts::where('wherePage','ProdByTag')->where('Display','!=','hide')->where('compType','!=','ProdInBox')->orderBy('sort','asc')->get();
+        $res=$this->responseLayout($getLayoutsLists,$cur,$ship);
+        $response['desktop']=$res;
+       }
+       else{
+           return 'wrong breakpoint';
+       }
+
+
 
 
        $response['tag']=$getPosts;
-       $response['desktop']=$res;
-       $response['mobile']=$res2;
 
 
        return response()->json($response, 200);
@@ -503,13 +523,26 @@ class ProductController extends Controller
        $init=$this->getProdBy($value,$limit,$cur,$ship,'search','','','','','','');
        $posts=$init['items'];
        $posts=$posts->toArray();
+       //return $posts;
        //Check filtter
        switch ($filter) {
            case 'PriceHighToLow':
                
                // Desc sort
                usort($posts,function($first,$second){
-                   return $first['price'] < $second['price'] ? 1 : -1;
+
+                if($first['type'] === 'variable' && $second['type'] === 'variable'){
+                    return $first['min_regular_price'] < $second['min_regular_price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'simple' && $second['type'] === 'simple'){
+                    return $first['price'] < $second['price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'variable' && $second['type'] === 'simple'){
+                    return $first['min_regular_price'] < $second['price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'simple' && $second['type'] === 'variable'){
+                    return $first['price'] < $second['min_regular_price'] ? 1 : -1;
+                }
                });
                
 
@@ -518,7 +551,18 @@ class ProductController extends Controller
 
                //Asc Sort
                usort($posts,function($first,$second){
-                   return $first['price'] > $second['price'] ? 1 : -1;
+                if($first['type'] === 'variable' && $second['type'] === 'variable'){
+                    return $first['min_regular_price'] > $second['min_regular_price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'simple' && $second['type'] === 'simple'){
+                    return $first['price'] > $second['price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'variable' && $second['type'] === 'simple'){
+                    return $first['min_regular_price'] > $second['price'] ? 1 : -1;
+                }
+                elseif($first['type'] === 'simple' && $second['type'] === 'variable'){
+                    return $first['price'] > $second['min_regular_price'] ? 1 : -1;
+                }
                });
 
                break;
@@ -597,6 +641,7 @@ class ProductController extends Controller
             }
             else{
                 $img='';
+                //default term image
             }
             return [
                 'name'=>$item->name,
@@ -642,8 +687,6 @@ class ProductController extends Controller
         $response['Tags'] = $transTag;
 
         return response()->json(['status'=>true,'items'=>$response], 200);
-
-        // return response()->json($transCat, 200);
     } 
 
 
